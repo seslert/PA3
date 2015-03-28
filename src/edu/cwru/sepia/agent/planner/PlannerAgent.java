@@ -41,7 +41,7 @@ public class PlannerAgent extends Agent {
 
         Stack<StripsAction> plan = AstarSearch(new GameState(stateView, playernum, requiredGold, requiredWood, buildPeasants));
 
-        if(plan == null) {
+        if (plan == null) {
             System.err.println("No plan was found");
             System.exit(1);
             return null;
@@ -91,7 +91,13 @@ public class PlannerAgent extends Agent {
      * @return The plan or null if no plan is found.
      */
     private Stack<StripsAction> AstarSearch(GameState startState) {
-        // TODO: Implement me!
+        
+    	Stack<StripsAction> actionPlan = new Stack<StripsAction>();
+    	PriorityQueue<GameState> openSet = new PriorityQueue<GameState>();
+    	Set<GameState> closedSet = new HashSet<GameState>();
+    	
+    	
+    	
         return null;
     }
 

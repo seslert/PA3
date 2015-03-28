@@ -70,7 +70,7 @@ public class PEAgent extends Agent {
     }
 
     /**
-     * This is where you will read the provided plan and execute it. If your plan is correct then when the plan is empty
+     * This is where you will read the provided plan and execute it. If your plan is correct, then when the plan is empty
      * the scenario should end with a victory. If the scenario keeps running after you run out of actions to execute
      * then either your plan is incorrect or your execution of the plan has a bug.
      *
