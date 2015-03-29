@@ -35,7 +35,7 @@ public class Position {
     }
 
     /**
-     * Gives the position one step in the specified direciton.
+     * Gives the position one step in the specified direction.
      *
      * @param direction North, south, east, etc.
      * @return Position one step away

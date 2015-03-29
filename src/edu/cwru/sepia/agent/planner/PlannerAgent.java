@@ -11,6 +11,10 @@ import java.util.*;
 
 /**
  * Created by Devin on 3/15/15.
+ * 
+ * @author Adam Boe
+ * @author Tim Sesler
+ * @date 27 March 2015
  */
 public class PlannerAgent extends Agent {
 
@@ -96,9 +100,43 @@ public class PlannerAgent extends Agent {
     	PriorityQueue<GameState> openSet = new PriorityQueue<GameState>();
     	Set<GameState> closedSet = new HashSet<GameState>();
     	
+    	openSet.add(startState);
     	
+    	while (!openSet.isEmpty()) {
+    		
+    		GameState current = null; // get lowest F cost node
+    		openSet.remove(current);
+    		
+    		if (current.isGoal()) {
+    			return actionPlan;
+    		}
+    		else {
+    			List<GameState> neighbors = null;
+    			closedSet.add(current);
+    			Iterator<GameState> i = neighbors.iterator();
+    			
+    			while (i.hasNext()) {
+    				GameState child = i.next();
+    				
+    				if (!closedSet.contains(child)) {
+    					double newGCost = current.getCost() + child.getCost();
+    					
+    					if (newGCost < child.getCost()) {
+    						// child.gCost = newGCost;
+    						// child.fCost = child.gCost + getChebyshevDistance;
+    						// child.cameFrom = current;
+    					}
+    					
+    					if (!openSet.contains(child)) {
+    						openSet.add(child);
+    					}
+    				}
+    			}
+    		}
+    	}
+    	System.out.println("FAILURE: No available path found.");
     	
-        return null;
+        return new Stack<StripsAction>();
     }
 
     /**

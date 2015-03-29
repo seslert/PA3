@@ -101,7 +101,8 @@ public class PEAgent extends Agent {
     @Override
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
         // TODO: Implement me!
-        return null;
+        
+    	return null;
     }
 
     /**
@@ -110,21 +111,17 @@ public class PEAgent extends Agent {
      * @return SEPIA representation of same action
      */
     private Action createSepiaAction(StripsAction action) {
-        return null;
+        
+    	return null;
     }
 
     @Override
-    public void terminalStep(State.StateView stateView, History.HistoryView historyView) {
-
-    }
+    public void terminalStep(State.StateView stateView, History.HistoryView historyView) {}
 
     @Override
-    public void savePlayerData(OutputStream outputStream) {
-
-    }
+    public void savePlayerData(OutputStream outputStream) {}
 
     @Override
-    public void loadPlayerData(InputStream inputStream) {
-
-    }
+    public void loadPlayerData(InputStream inputStream) {}
+    
 }

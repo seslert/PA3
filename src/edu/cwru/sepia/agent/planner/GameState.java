@@ -5,7 +5,7 @@ import edu.cwru.sepia.environment.model.state.State;
 import java.util.List;
 
 /**
- * This class is used to represent the state of the game after applying one of the avaiable actions. It will also
+ * This class is used to represent the state of the game after applying one of the available actions. It will also
  * track the A* specific information such as the parent pointer and the cost and heuristic function. Remember that
  * unlike the path planning A* from the first assignment the cost of an action may be more than 1. Specifically the cost
  * of executing a compound action such as move can be more than 1. You will need to account for this in your heuristic
@@ -24,9 +24,14 @@ import java.util.List;
 public class GameState implements Comparable<GameState> {
 	
 	private State.StateView stateView;
+	private GameState parent;
+	
 	private int playernum;
 	private int requiredGold;
 	private int requiredWood;
+	
+	private double gCost;
+	
 	private boolean buildPeasants;
 
     /**
@@ -44,6 +49,14 @@ public class GameState implements Comparable<GameState> {
     	this.requiredGold = requiredGold;
     	this.requiredWood = requiredWood;
     	this.buildPeasants = buildPeasants;
+    }
+    
+    /**
+     * Sets the parent pointer for this GameState.
+     * @param parent
+     */
+    public void setParentState(GameState parent) {
+    	this.parent = parent;
     }
 
     /**
