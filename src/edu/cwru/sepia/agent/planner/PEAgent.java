@@ -42,25 +42,28 @@ public class PEAgent extends Agent {
         super(playernum);
         peasantIdMap = new HashMap<Integer, Integer>();
         this.plan = plan;
-
     }
 
     @Override
     public Map<Integer, Action> initialStep(State.StateView stateView, History.HistoryView historyView) {
-        // gets the townhall ID and the peasant ID
+        
+    	// Gets the townhall ID and the peasant ID
         for(int unitId : stateView.getUnitIds(playernum)) {
             Unit.UnitView unit = stateView.getUnit(unitId);
             String unitType = unit.getTemplateView().getName().toLowerCase();
-            if(unitType.equals("townhall")) {
+            
+            if (unitType.equals("townhall")) {
                 townhallId = unitId;
-            } else if(unitType.equals("peasant")) {
+            } 
+            else if (unitType.equals("peasant")) {
                 peasantIdMap.put(unitId, unitId);
             }
         }
 
         // Gets the peasant template ID. This is used when building a new peasant with the townhall
         for(Template.TemplateView templateView : stateView.getTemplates(playernum)) {
-            if(templateView.getName().toLowerCase().equals("peasant")) {
+            
+        	if (templateView.getName().toLowerCase().equals("peasant")) {
                 peasantTemplateId = templateView.getID();
                 break;
             }
@@ -111,6 +114,22 @@ public class PEAgent extends Agent {
      * @return SEPIA representation of same action
      */
     private Action createSepiaAction(StripsAction action) {
+    	
+    	if (action instanceof MoveAction) {
+    		MoveAction moveAction = (MoveAction) action;
+    		Position destination = moveAction.getDestination();
+    		
+    		return Action.createCompoundMove(moveAction.getPeasantId(), destination.x, destination.y);
+    	}
+    	
+    	if (action instanceof HarvestAction) {
+    		HarvestAction harvestAction;
+    		// Action.createPrimitiveDeposit(int peasantId, Direction townhallDirection)
+    	}
+    	if (action instanceof DepositAction) {
+    		
+    		// Action.createPrimitiveGather(int peasantId, Direction resourceDirection)
+    	}
         
     	return null;
     }

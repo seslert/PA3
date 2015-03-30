@@ -69,6 +69,7 @@ public class Position {
      * @return True if in bounds, false otherwise.
      */
     public boolean inBounds(int xExtent, int yExtent) {
+    	
         return (x >= 0 && y >= 0 && x < xExtent && y < yExtent);
     }
 

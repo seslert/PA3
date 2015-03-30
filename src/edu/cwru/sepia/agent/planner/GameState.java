@@ -92,6 +92,7 @@ public class GameState implements Comparable<GameState> {
      */
     public double heuristic() {
         // TODO: Implement me!
+    	
         return 0.0;
     }
 
@@ -104,6 +105,7 @@ public class GameState implements Comparable<GameState> {
      */
     public double getCost() {
         // TODO: Implement me!
+    	
         return 0.0;
     }
 
@@ -116,10 +118,18 @@ public class GameState implements Comparable<GameState> {
      */
     @Override
     public int compareTo(GameState o) {
-        // TODO: Implement me!
+        
+    	if (this.getCost() > o.getCost()) {
+    		
+    		return 1;
+    	}
     	
+    	if (this.equals(o)) {
+    		
+    		return 0;
+    	}
     	
-        return 0;
+        return -1;
     }
 
     /**
@@ -143,8 +153,15 @@ public class GameState implements Comparable<GameState> {
      */
     @Override
     public int hashCode() {
-        // TODO: Implement me!
+        int hashCode = 0;
+        
+        if (buildPeasants) {
+        	hashCode++;
+        }
+        hashCode += (requiredGold / playernum);
+        hashCode += (requiredWood / playernum);        
     	
-        return 0;
+        return hashCode;
     }
+    
 }
