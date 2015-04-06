@@ -128,10 +128,35 @@ public class GameState implements Comparable<GameState> {
      * @return The value estimated remaining cost to reach a goal state from this state.
      */
     public double heuristic() {
-        // TODO: Implement me!
+
+    	double lowestDistance = Double.MAX_VALUE;
+    	boolean goldGoalReached = currentGold >= requiredGold;
+    	boolean woodGoalReached = currentWood >= requiredWood; 
     	
+    	for (ResourceView resource : resources) {
+    		String resourceType = resource.getType().name().toLowerCase();
+    		
+    		// We already have enough wood.  Move to the next resource.
+    		if (woodGoalReached && resourceType.equals("wood")) {
+    			break;
+    		}
+    		
+    		// We already have enough gold.  Move to the next resource.
+    		if (goldGoalReached && resourceType.equals("gold")) {
+    			break;
+    		}
+    		
+    		// Determine the distance to a resource that we actually need.
+    		Position townhallPos = new Position(this.townhall.getXPosition(), this.townhall.getYPosition());
+			Position resourcePos = new Position(resource.getXPosition(), resource.getYPosition());
+			double currentDistance = townhallPos.euclideanDistance(resourcePos);
+			
+			if (currentDistance < lowestDistance) {
+				lowestDistance = currentDistance;
+    		}
+    	}
     	
-        return 0.0;
+        return lowestDistance * 10;
     }
 
     /**
@@ -142,9 +167,17 @@ public class GameState implements Comparable<GameState> {
      * @return The current cost to reach this goal
      */
     public double getCost() {
-        // TODO: Implement me!
+
+    	double tentativeGCost = 0.0;
+    	GameState current = this;
     	
-        return 0.0;
+    	while (current.parent != null) {
+    		tentativeGCost++;
+    		current = current.parent;
+    	}
+    	this.gCost = tentativeGCost;
+    	
+        return tentativeGCost;
     }
     
     public double getFunctionalCost() {
@@ -271,8 +304,15 @@ public class GameState implements Comparable<GameState> {
         if (buildPeasants) {
         	hashCode++;
         }
-        hashCode += (currentGold / playernum);
-        hashCode += (currentWood / playernum);        
+        hashCode += (currentGold * playernum);
+        hashCode += (currentWood * playernum);
+        hashCode *= peasants.size();
+        hashCode *= resources.size();
+        
+        for (ResourceView resource : resources) {
+        	
+        	hashCode += resource.getAmountRemaining();
+        }
     	
         return hashCode;
     }
