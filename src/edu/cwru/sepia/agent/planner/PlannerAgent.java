@@ -72,19 +72,13 @@ public class PlannerAgent extends Agent {
     }
 
     @Override
-    public void terminalStep(State.StateView stateView, History.HistoryView historyView) {
-
-    }
+    public void terminalStep(State.StateView stateView, History.HistoryView historyView) {}
 
     @Override
-    public void savePlayerData(OutputStream outputStream) {
-
-    }
+    public void savePlayerData(OutputStream outputStream) {}
 
     @Override
-    public void loadPlayerData(InputStream inputStream) {
-
-    }
+    public void loadPlayerData(InputStream inputStream) {}
 
     /**
      * Perform an A* search of the game graph. This should return your plan as a stack of actions. This is essentially
@@ -97,19 +91,21 @@ public class PlannerAgent extends Agent {
     private Stack<StripsAction> AstarSearch(GameState startState) {
         
     	Stack<StripsAction> actionPlan = new Stack<StripsAction>();
-    	PriorityQueue<GameState> openSet = new PriorityQueue<GameState>();
+    	List<GameState> openSet = new ArrayList<GameState>();
     	Set<GameState> closedSet = new HashSet<GameState>();
+    	GameState current = startState;
     	
-    	openSet.add(startState);
+    	openSet.add(current);
     	
     	while (!openSet.isEmpty()) {
-    		
-    		GameState current = null; // get lowest F cost node
-    		openSet.remove(current);
+    		current = openSet.get(0);
     		
     		if (current.isGoal()) {
+    			
     			return actionPlan;
     		}
+    		//openSet.remove(current);
+    		
     		else {
     			List<GameState> neighbors = null;
     			closedSet.add(current);
