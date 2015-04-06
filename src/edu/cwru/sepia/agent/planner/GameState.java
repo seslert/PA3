@@ -29,6 +29,8 @@ public class GameState implements Comparable<GameState> {
 	private int playernum;
 	private int requiredGold;
 	private int requiredWood;
+	private int xExtent;
+	private int yExtent;
 	
 	private double gCost;
 	
@@ -46,9 +48,12 @@ public class GameState implements Comparable<GameState> {
      */
     public GameState(State.StateView state, int playernum, int requiredGold, int requiredWood, boolean buildPeasants) {
         
+    	this.stateView = state; 
     	this.requiredGold = requiredGold;
     	this.requiredWood = requiredWood;
     	this.buildPeasants = buildPeasants;
+    	this.xExtent = stateView.getXExtent();
+    	this.yExtent = stateView.getYExtent();
     }
     
     /**

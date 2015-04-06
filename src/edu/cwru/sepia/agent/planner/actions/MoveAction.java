@@ -2,6 +2,8 @@ package edu.cwru.sepia.agent.planner.actions;
 
 import edu.cwru.sepia.agent.planner.GameState;
 import edu.cwru.sepia.agent.planner.Position;
+import edu.cwru.sepia.environment.model.state.Unit;
+import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 
 public class MoveAction implements StripsAction {
 	
@@ -13,6 +15,7 @@ public class MoveAction implements StripsAction {
 	 * @param destination
 	 */
 	public MoveAction(int peasantId, Position destination) {
+		
 		this.peasantId = peasantId;
 		this.destination = destination;
 	}
@@ -23,6 +26,7 @@ public class MoveAction implements StripsAction {
 	 * @param y
 	 */
 	public MoveAction(int peasantId, int x, int y) {
+		
 		this(peasantId, new Position(x, y));
 	}
 	
@@ -34,6 +38,11 @@ public class MoveAction implements StripsAction {
 	public Position getDestination() {
 		
 		return this.destination;
+	}
+	
+	public Position getOrigin() {
+		
+		return null;
 	}
 	
 	@Override
@@ -51,7 +60,7 @@ public class MoveAction implements StripsAction {
 	@Override
 	public String toString() {
 		
-		return new String("MOVEACTION " + destination.toString());
+		return new String("MOVEACTION CREATED FOR PEASANT: " + peasantId + "\nDESTINATION: " + destination.toString());
 	}
 
 }

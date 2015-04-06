@@ -8,6 +8,7 @@ import edu.cwru.sepia.environment.model.state.ResourceType;
 import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Template;
 import edu.cwru.sepia.environment.model.state.Unit;
+import edu.cwru.sepia.util.Direction;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -105,6 +106,17 @@ public class PEAgent extends Agent {
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
         // TODO: Implement me!
         
+    	// TODO: Don't know what to do with this yet...
+    	/*
+    	if (stateView.getTurnNumber() != 0) {
+    		
+    		Map<Integer, ActionResult> actionResults = historyView.getCommandFeedback(playernum, stateView.getTurnNumber() - 1);
+    		
+    		for (ActionResult result : actionResults.values()) {
+    			System.out.println(result.toString());
+    		}
+    	}
+    	*/
     	return null;
     }
 
@@ -123,12 +135,15 @@ public class PEAgent extends Agent {
     	}
     	
     	if (action instanceof HarvestAction) {
-    		HarvestAction harvestAction;
-    		// Action.createPrimitiveDeposit(int peasantId, Direction townhallDirection)
-    	}
-    	if (action instanceof DepositAction) {
+    		HarvestAction harvestAction = (HarvestAction) action;    		
     		
-    		// Action.createPrimitiveGather(int peasantId, Direction resourceDirection)
+    		return Action.createPrimitiveGather(harvestAction.getPeasantId(), harvestAction.getTownhallDirection());
+    	}
+    	
+    	if (action instanceof DepositAction) {
+    		DepositAction depositAction = (DepositAction) action;
+    		
+    		return Action.createPrimitiveDeposit(depositAction.getPeasantId(), depositAction.getResourceDirection());
     	}
         
     	return null;
