@@ -54,13 +54,18 @@ public class MoveAction implements StripsAction {
 	@Override
 	public GameState apply(GameState state) {
 		
-		return null;
+		if (state.peasantPositions != null) {
+			state.peasantPositions.remove(peasantId);
+		}		
+		state.peasantPositions.put(peasantId, destination);		
+		
+		return state;
 	}
 	
 	@Override
 	public String toString() {
 		
-		return new String("MOVEACTION CREATED FOR PEASANT: " + peasantId + "\nDESTINATION: " + destination.toString());
+		return new String("ACTION: MOVE PEASANT: " + peasantId + " DESTINATION: " + destination.toString()) + "\n";
 	}
 
 }

@@ -100,9 +100,12 @@ public class PlannerAgent extends Agent {
     	while (!openSet.isEmpty()) {
     		current = openSet.poll();
     		
+			// TODO: remove
+        	System.out.println("CURRENT " + current.toString());
+    		
     		if (current.isGoal()) {
     			
-    			return actionPlan;
+    			return reconstructActionPlan(current);
     		}
     		openSet.remove(current);
     		closedSet.add(current);
@@ -111,6 +114,9 @@ public class PlannerAgent extends Agent {
     			
 			while (i.hasNext()) {
 				GameState child = i.next();
+				
+				// TODO: remove
+	        	System.out.println("CHILD " + child.toString());
 				
 				if (!closedSet.contains(child)) {
 					double newGCost = current.getCost() + child.getCost();
@@ -132,12 +138,19 @@ public class PlannerAgent extends Agent {
         return new Stack<StripsAction>();
     }
     
+    /**
+     * Rebuilds the action plan from the final GameState chosen through A*.
+     * @param finalState
+     * @return
+     */
     private Stack<StripsAction> reconstructActionPlan(GameState finalState) {
     	Stack<StripsAction> actionPlan = new Stack<StripsAction>();
+    	GameState current = finalState;
     	
-    	//while () {
-    		
-    	//}
+    	while (current.parent != null) {
+    		actionPlan.push(current.actionHistory);    		
+    		current = current.parent;
+    	}
     	
     	return actionPlan;
     }
