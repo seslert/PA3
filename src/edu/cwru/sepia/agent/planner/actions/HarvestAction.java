@@ -3,6 +3,7 @@ package edu.cwru.sepia.agent.planner.actions;
 import edu.cwru.sepia.agent.planner.GameState;
 import edu.cwru.sepia.agent.planner.Peasant;
 import edu.cwru.sepia.agent.planner.Position;
+import edu.cwru.sepia.environment.model.state.ResourceNode;
 import edu.cwru.sepia.environment.model.state.ResourceNode.ResourceView;
 import edu.cwru.sepia.environment.model.state.ResourceType;
 import edu.cwru.sepia.environment.model.state.Unit.UnitView;
@@ -10,14 +11,16 @@ import edu.cwru.sepia.util.Direction;
 
 public class HarvestAction implements StripsAction {
 	
-	private Direction resourceDirection;	
+	private Direction resourceDirection;
 	private ResourceType resourceType;
+	private ResourceNode resourceNode;
 	private int peasantId;
 	
-	public HarvestAction(int peasantId, Direction resourceDirection, String resourceType) {
+	public HarvestAction(int peasantId, Direction resourceDirection, String resourceType, ResourceNode resourceNode) {
 		
 		this.peasantId = peasantId;
 		this.resourceDirection = resourceDirection;
+		this.resourceNode = resourceNode;
 		this.resourceType = getEnum(resourceType);
 	}
 	
@@ -56,7 +59,7 @@ public class HarvestAction implements StripsAction {
 			
 			Position peasantPos = state.peasants.get(peasantId).getPosition();
 			
-			for (ResourceView resource : state.resources) {
+			for (ResourceNode resource : state.resources) {
 				
 				String resourceType = resource.getType().name().toLowerCase();
 				
@@ -76,7 +79,7 @@ public class HarvestAction implements StripsAction {
 		case WOOD:
 			peasantPos = state.peasants.get(peasantId).getPosition();
 			
-			for (ResourceView resource : state.resources) {
+			for (ResourceNode resource : state.resources) {
 				
 				String resourceType = resource.getType().name().toLowerCase();
 				
@@ -109,9 +112,13 @@ public class HarvestAction implements StripsAction {
 			state.peasants.get(peasantId).setCargoType(ResourceType.WOOD);
 			break;
 		}
-		state.peasants.get(peasantId).addCargo(100);		
+		state.peasants.get(peasantId).addCargo(resourceNode.reduceAmountRemaining(100));
 		
-		return null;
+//		if (resourceNode.getAmountRemaining() >= 100) {
+//			resourceNode.reduceAmountRemaining(100);
+//		}		
+		
+		return state;
 	}
 	
 	@Override

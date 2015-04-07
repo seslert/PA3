@@ -42,6 +42,10 @@ public class Peasant {
 		}
 	}
 	
+	public void removeCargo() {
+		this.cargoAmount = 0;
+	}
+	
 	public ResourceType getCargoType() {
 		
 		if (this.cargoType != null) {

@@ -4,6 +4,7 @@ import edu.cwru.sepia.agent.planner.actions.DepositAction;
 import edu.cwru.sepia.agent.planner.actions.HarvestAction;
 import edu.cwru.sepia.agent.planner.actions.MoveAction;
 import edu.cwru.sepia.agent.planner.actions.StripsAction;
+import edu.cwru.sepia.environment.model.state.ResourceNode;
 import edu.cwru.sepia.environment.model.state.ResourceNode.ResourceView;
 import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Unit.UnitView;
@@ -33,20 +34,14 @@ import java.util.Map;
 public class GameState implements Comparable<GameState> {
 	
 	public State.StateView stateView;
-	
 	public StripsAction actionHistory;
-	
 	public GameState parent;
 	public GameState astarParent;
-	
 	public List<UnitView> units;
-	public List<ResourceView> resources;
+	public List<ResourceNode> resources;
 	public Map<Integer, Peasant> peasants;
 	public UnitView townhall;
-	
 	public double fCost, gCost, hCost;
-	
-	public Map<Integer, Position> peasantPositions;
 	
 	private int playernum;
 	private int requiredGold;
@@ -71,7 +66,6 @@ public class GameState implements Comparable<GameState> {
      */
     public GameState(State.StateView state, int playernum, int requiredGold, int requiredWood, boolean buildPeasants) {
         
-    	peasantPositions = new HashMap<Integer, Position>();
     	this.stateView = state; 
     	this.requiredGold = requiredGold;
     	this.requiredWood = requiredWood;
@@ -79,9 +73,10 @@ public class GameState implements Comparable<GameState> {
     	this.xExtent = stateView.getXExtent();
     	this.yExtent = stateView.getYExtent();
     	this.units = stateView.getAllUnits();
-    	this.resources = stateView.getAllResourceNodes();
+    	//this.resources = stateView.getAllResourceNodes();
     	
     	this.peasants = new HashMap<Integer, Peasant>();
+    	this.resources = new ArrayList<ResourceNode>();
     	
     	// Get the peasant units and the townhall
     	for (UnitView unit : units) {
@@ -99,7 +94,11 @@ public class GameState implements Comparable<GameState> {
     		}
     	}
     	
-    	applyAction();
+    	for (ResourceView r : stateView.getAllResourceNodes()) {    		
+    		this.resources.add(new ResourceNode(r.getType(), r.getXPosition(), r.getYPosition(), r.getAmountRemaining(), r.getID()));
+    	}
+    	
+    	//applyAction();
     	calculateGCost();
     	calculateFunctionalCost();
     }
@@ -111,43 +110,32 @@ public class GameState implements Comparable<GameState> {
     public GameState(GameState parent, StripsAction actionHistory) {
     	this.actionHistory = actionHistory;
     	this.parent = parent;
-    	
     	this.stateView = parent.stateView;
     	this.requiredGold = parent.requiredGold;
     	this.requiredWood = parent.requiredWood;
+    	this.currentGold = parent.currentGold;
+    	this.currentWood = parent.currentWood;
     	this.buildPeasants = parent.buildPeasants;
-    	
     	this.xExtent = this.stateView.getXExtent();
     	this.yExtent = this.stateView.getYExtent();
     	this.units = parent.units;
-    	this.resources = new ArrayList<ResourceView>(parent.resources);
+    	this.resources = new ArrayList<ResourceNode>(parent.resources);
     	this.peasants = new HashMap<Integer, Peasant>();
     	
     	for (Peasant peasant : parent.peasants.values()) {
     		this.peasants.put(peasant.getID(), peasant);
     	}
-    	//this.peasants = new HashMap<Integer, Peasant>(parent.peasants);
     	
     	this.townhall = parent.townhall;
     	    	
-    	System.out.println("Peasant " + peasants.get(1).getID() + " position before: " + peasants.get(1).getPosition().toString());
+    	//System.out.println("Peasant " + peasants.get(1).getID() + " position before: " + peasants.get(1).getPosition().toString());
     	
-    	applyAction();
+    	//applyAction();
     	
-    	System.out.println("Peasant " + peasants.get(1).getID() + " position after: " + peasants.get(1).getPosition().toString());
+    	//System.out.println("Peasant " + peasants.get(1).getID() + " position after: " + peasants.get(1).getPosition().toString());
     	
     	calculateGCost();
     	calculateFunctionalCost();    	
-    }
-    
-    /**
-     * 
-     */
-    public void applyAction() {
-    	
-    	if (this.actionHistory != null) {
-    		this.actionHistory.apply(this);
-    	}    	
     }
     
     /**
@@ -192,7 +180,9 @@ public class GameState implements Comparable<GameState> {
     			// The peasant is next to the townhall and should deposit.
     			if (depositAction.preconditionsMet(this)) {
     				//DepositAction depositAction = new DepositAction(peasant.getID(), peasantPos.getDirection(townhallPos), peasant.getCargoType().name().toUpperCase());
-    				children.add(new GameState(this, depositAction));
+    				//children.add(new GameState(this, depositAction));
+    				GameState st = new GameState(this, depositAction);
+    				children.add(depositAction.apply(st));
     			}
     			// The peasant has cargo and needs to get to the townhall to deposit.
     			else {
@@ -200,18 +190,22 @@ public class GameState implements Comparable<GameState> {
         			
         			for (Position position : openPositions) {    				
         				MoveAction moveAction = new MoveAction(peasant.getID(), position);
-        				children.add(new GameState(this, moveAction));
+        				//children.add(new GameState(this, moveAction));
+        				GameState st = new GameState(this, moveAction);
+        				children.add(moveAction.apply(st));
         			}
     			}    			
     		}
     		// The peasant does not have cargo and needs to either get to a resource or gather if it is next to one already.
     		else {
-    			for (ResourceView resource : resources) {
+    			for (ResourceNode resource : resources) {
     				Position resourcePos = getResourcePosition(resource);
     				
     				if (peasantPos.isAdjacent(resourcePos)) {
-    					HarvestAction harvestAction = new HarvestAction(peasant.getID(), peasantPos.getDirection(resourcePos), resource.getType().name().toUpperCase());
-    					children.add(new GameState(this, harvestAction));
+    					HarvestAction harvestAction = new HarvestAction(peasant.getID(), peasantPos.getDirection(resourcePos), resource.getType().name().toUpperCase(), resource);
+//    					children.add(new GameState(this, harvestAction));
+    					GameState st = new GameState(this, harvestAction);
+    					children.add(harvestAction.apply(st));
     				}
     				// The peasant needs to move adjacent to the resource.
     				else {
@@ -219,7 +213,9 @@ public class GameState implements Comparable<GameState> {
             			
             			for (Position position : openPositions) {    				
             				MoveAction moveAction = new MoveAction(peasant.getID(), position);
-            				children.add(new GameState(this, moveAction));
+            				//children.add(new GameState(this, moveAction));
+            				GameState st = new GameState(this, moveAction);
+            				children.add(moveAction.apply(st));
             			}
     				}
     			}
@@ -235,12 +231,8 @@ public class GameState implements Comparable<GameState> {
      * @return
      */
     public Position getUnitPosition(UnitView unit) {
-    	
-    	if (unit.getTemplateView().getName().toLowerCase().equals("townhall")) {
-    		return new Position(unit.getXPosition(), unit.getYPosition());
-    	}
-    	
-    	return peasantPositions.get(unit.getID());
+    	    	
+    	return new Position(unit.getXPosition(), unit.getYPosition());
     }
     
     /**
@@ -248,9 +240,9 @@ public class GameState implements Comparable<GameState> {
      * @param resource
      * @return
      */
-    public Position getResourcePosition(ResourceView resource) {
+    public Position getResourcePosition(ResourceNode resource) {
     	
-    	return new Position(resource.getXPosition(), resource.getYPosition());
+    	return new Position(resource.getxPosition(), resource.getyPosition());
     }
     
     public void addGold(int amount) {
@@ -274,7 +266,7 @@ public class GameState implements Comparable<GameState> {
     	boolean goldGoalReached = currentGold >= requiredGold;
     	boolean woodGoalReached = currentWood >= requiredWood; 
     	
-    	for (ResourceView resource : resources) {
+    	for (ResourceNode resource : resources) {
     		String resourceType = resource.getType().name().toLowerCase();
     		
     		// We already have enough wood.  Move to the next resource.
@@ -289,7 +281,7 @@ public class GameState implements Comparable<GameState> {
     		
     		// Determine the distance to a resource that we actually need.
 			for (Peasant peasant : peasants.values()) {
-				Position resourcePos = new Position(resource.getXPosition(), resource.getYPosition());
+				Position resourcePos = getResourcePosition(resource);//new Position(resource.getXPosition(), resource.getYPosition());
 				Position peasantPos = peasant.getPosition();
 				overallDistance += peasantPos.euclideanDistance(resourcePos);
 			}
@@ -407,16 +399,15 @@ public class GameState implements Comparable<GameState> {
     	}
     	
     	// Look at resource locations, resource types, and amounts remaining to determine equality. 
-    	for (ResourceView resource1 : this.resources) {    		
+    	for (ResourceNode resource1 : this.resources) {    		
     		int numMatches = 0;
     		
-    		for (ResourceView resource2 : compare.resources) {
-    			Position p1 = new Position(resource1.getXPosition(), resource1.getYPosition());
-    			Position p2 = new Position(resource2.getXPosition(), resource2.getYPosition());
+    		for (ResourceNode resource2 : compare.resources) {
+    			Position p1 = getResourcePosition(resource1); //new Position(resource1.getXPosition(), resource1.getYPosition());
+    			Position p2 = getResourcePosition(resource2); //new Position(resource2.getXPosition(), resource2.getYPosition());
     			
     			// The resource has an exact match.
     			if (p1.equals(p2) && resource1.getAmountRemaining() == resource2.getAmountRemaining() && resource1.getType().equals(resource2.getType())) {
-    				
     				numMatches++;
     			}	
     		}
@@ -453,11 +444,11 @@ public class GameState implements Comparable<GameState> {
         	hashCode += p.getXPosition();
         	hashCode += p.getYPosition();
         	
-        	// TODO: Remove
-        	System.out.println("\nHashCode peasant position: " + p.getPosition().toString());
+//        	// TODO: Remove
+//        	System.out.println("\nHashCode peasant position: " + p.getPosition().toString());
         }
         
-        for (ResourceView resource : resources) {
+        for (ResourceNode resource : resources) {
         	hashCode += resource.getAmountRemaining();
         }
         hashCode /= (int)getFunctionalCost();

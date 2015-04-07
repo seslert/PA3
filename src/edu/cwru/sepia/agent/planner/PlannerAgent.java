@@ -98,6 +98,11 @@ public class PlannerAgent extends Agent {
     	openSet.add(current);
     	
     	while (!openSet.isEmpty()) {
+    		try {
+    			Thread.sleep(1000);
+    		}
+    		catch(Exception e) {}
+    		
     		current = openSet.poll();
     		
 			// TODO: remove
@@ -108,18 +113,14 @@ public class PlannerAgent extends Agent {
     			return reconstructActionPlan(current);
     		}
     		openSet.remove(current);
-    		
-    		//System.out.println("Hashcode before: " + current.hashCode());
-    		
-    		closedSet.add(current);
-    		
-    		//System.out.println("Hashcode after: " + current.hashCode());
-    		
+    		closedSet.add(current);    		
     		List<GameState> children = current.generateChildren();
     		Iterator<GameState> i = children.iterator();
     			
 			while (i.hasNext()) {
 				GameState child = i.next();
+				
+				System.out.println("======================" + child);
 				
 				// TODO: remove
 	        	System.out.println("CHILD " + child.toString());

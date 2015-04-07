@@ -69,6 +69,7 @@ public class DepositAction implements StripsAction {
 			break;
 	
 		}
+		state.peasants.get(peasantId).removeCargo();
 		
 		return state;
 	}

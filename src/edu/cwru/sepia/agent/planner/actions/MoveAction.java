@@ -58,7 +58,7 @@ public class MoveAction implements StripsAction {
 		
 		if (state.peasants != null) {
 			state.peasants.get(peasantId).setPosition(destination);
-		}						
+		}
 		
 		return state;
 	}
