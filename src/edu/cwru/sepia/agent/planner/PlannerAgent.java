@@ -108,7 +108,13 @@ public class PlannerAgent extends Agent {
     			return reconstructActionPlan(current);
     		}
     		openSet.remove(current);
+    		
+    		//System.out.println("Hashcode before: " + current.hashCode());
+    		
     		closedSet.add(current);
+    		
+    		//System.out.println("Hashcode after: " + current.hashCode());
+    		
     		List<GameState> children = current.generateChildren();
     		Iterator<GameState> i = children.iterator();
     			
@@ -124,7 +130,7 @@ public class PlannerAgent extends Agent {
 					if (newGCost < child.getCost()) {
 						child.gCost = newGCost;
 						child.calculateFunctionalCost();
-						child.setParentState(current);
+						child.setAstarParent(current);
 					}
 					
 					if (!openSet.contains(child)) {
@@ -147,9 +153,9 @@ public class PlannerAgent extends Agent {
     	Stack<StripsAction> actionPlan = new Stack<StripsAction>();
     	GameState current = finalState;
     	
-    	while (current.parent != null) {
+    	while (current.astarParent != null) {
     		actionPlan.push(current.actionHistory);    		
-    		current = current.parent;
+    		current = current.astarParent;
     	}
     	
     	return actionPlan;

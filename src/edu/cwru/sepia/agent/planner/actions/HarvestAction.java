@@ -1,15 +1,16 @@
 package edu.cwru.sepia.agent.planner.actions;
 
 import edu.cwru.sepia.agent.planner.GameState;
+import edu.cwru.sepia.agent.planner.Peasant;
 import edu.cwru.sepia.agent.planner.Position;
 import edu.cwru.sepia.environment.model.state.ResourceNode.ResourceView;
+import edu.cwru.sepia.environment.model.state.ResourceType;
 import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 import edu.cwru.sepia.util.Direction;
 
 public class HarvestAction implements StripsAction {
 	
 	private Direction resourceDirection;	
-	private enum ResourceType { GOLD, WOOD };
 	private ResourceType resourceType;
 	private int peasantId;
 	
@@ -50,40 +51,65 @@ public class HarvestAction implements StripsAction {
 	@Override
 	public boolean preconditionsMet(GameState state) {
 		
-//		switch (resourceType) {
-//		case GOLD:
-//			
-//			UnitView peasant = state.stateView.getUnit(peasantId);
-//			Position peasantPos = state.getUnitPosition(peasant);
-//			
-//			for (ResourceView resource : state.resources) {
-//				
-//				String resourceType = resource.getType().name().toLowerCase();
-//				
-//				if (resourceType.equals("wood")) {
-//					return false;
-//				}
-//				else {
-//					Position resourcePos = state.getResourcePosition(resource);
-//				
-//					if (peasantPos.isAdjacent(resourcePos)) {
-//						return true;
-//					}
-//				}
-//			}
-//			break;
-//			
-//		case WOOD:
-//			break;
-//		}
+		switch (resourceType) {
+		case GOLD:
+			
+			Position peasantPos = state.peasants.get(peasantId).getPosition();
+			
+			for (ResourceView resource : state.resources) {
+				
+				String resourceType = resource.getType().name().toLowerCase();
+				
+				if (resourceType.equals("wood")) {
+					return false;
+				}
+				else {
+					Position resourcePos = state.getResourcePosition(resource);
+				
+					if (peasantPos.isAdjacent(resourcePos)) {
+						return true;
+					}
+				}
+			}
+			break;
+			
+		case WOOD:
+			peasantPos = state.peasants.get(peasantId).getPosition();
+			
+			for (ResourceView resource : state.resources) {
+				
+				String resourceType = resource.getType().name().toLowerCase();
+				
+				if (resourceType.equals("gold")) {
+					return false;
+				}
+				else {
+					Position resourcePos = state.getResourcePosition(resource);
+				
+					if (peasantPos.isAdjacent(resourcePos)) {
+						return true;
+					}
+				}
+			}
+			break;
+		}
 		
 		return false;
 	}
 	
 	@Override
 	public GameState apply(GameState state) {
-		UnitView peasant = state.stateView.getUnit(peasantId);
-		//peasant.getTemplateView()
+		
+		switch (resourceType) {
+		
+		case GOLD:
+			state.peasants.get(peasantId).setCargoType(ResourceType.GOLD);
+			break;
+		case WOOD:
+			state.peasants.get(peasantId).setCargoType(ResourceType.WOOD);
+			break;
+		}
+		state.peasants.get(peasantId).addCargo(100);		
 		
 		return null;
 	}

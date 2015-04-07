@@ -3,13 +3,13 @@ package edu.cwru.sepia.agent.planner.actions;
 import edu.cwru.sepia.agent.planner.GameState;
 import edu.cwru.sepia.agent.planner.Position;
 import edu.cwru.sepia.environment.model.state.ResourceNode.ResourceView;
+import edu.cwru.sepia.environment.model.state.ResourceType;
 import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 import edu.cwru.sepia.util.Direction;
 
 public class DepositAction implements StripsAction {
 	
 	private Direction resourceDirection;
-	private enum ResourceType { GOLD, WOOD };
 	private ResourceType resourceType;
 	private int peasantId;
 	
@@ -49,8 +49,8 @@ public class DepositAction implements StripsAction {
 	
 	@Override
 	public boolean preconditionsMet(GameState state) {
-		UnitView peasant = state.stateView.getUnit(peasantId);
-		Position peasantPos = state.getUnitPosition(peasant);
+		//UnitView peasant = state.stateView.getUnit(peasantId);
+		Position peasantPos = state.peasants.get(peasantId).getPosition();
 		Position townhallPos = state.getUnitPosition(state.townhall);
 		
 		return peasantPos.isAdjacent(townhallPos);
@@ -76,7 +76,7 @@ public class DepositAction implements StripsAction {
 	@Override
 	public String toString() {
 		
-		return "ACTION: DEPOSIT PEASANT: " + peasantId + "RESOURCE: " + resourceType.toString() + "\n";
+		return "ACTION: DEPOSIT PEASANT: " + peasantId + " RESOURCE: " + resourceType.toString() + "\n";
 	}
 
 }
