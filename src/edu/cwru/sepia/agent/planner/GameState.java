@@ -75,6 +75,9 @@ public class GameState implements Comparable<GameState> {
     	this.units = stateView.getAllUnits();
     	this.resources = stateView.getAllResourceNodes();
     	
+    	this.peasants = new ArrayList<UnitView>();
+    	this.resources = new ArrayList<ResourceView>();
+    	
     	// Get the peasant units and the townhall
     	for (UnitView unit : units) {
     		String unitType = unit.getTemplateView().getName().toLowerCase();
