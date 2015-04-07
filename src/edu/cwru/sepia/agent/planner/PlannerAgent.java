@@ -98,18 +98,13 @@ public class PlannerAgent extends Agent {
     	openSet.add(current);
     	
     	while (!openSet.isEmpty()) {
-    		try {
-    			Thread.sleep(1000);
-    		}
-    		catch(Exception e) {}
-    		
     		current = openSet.poll();
     		
 			// TODO: remove
         	System.out.println("CURRENT " + current.toString());
     		
     		if (current.isGoal()) {
-    			
+    			System.out.println("WE FOUND A PATH!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     			return reconstructActionPlan(current);
     		}
     		openSet.remove(current);
@@ -118,9 +113,7 @@ public class PlannerAgent extends Agent {
     		Iterator<GameState> i = children.iterator();
     			
 			while (i.hasNext()) {
-				GameState child = i.next();
-				
-				System.out.println("======================" + child);
+				GameState child = i.next();			
 				
 				// TODO: remove
 	        	System.out.println("CHILD " + child.toString());

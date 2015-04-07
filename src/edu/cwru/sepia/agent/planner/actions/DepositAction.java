@@ -22,7 +22,7 @@ public class DepositAction implements StripsAction {
 	
 	public ResourceType getEnum(String value) {
 		
-		if (value.toLowerCase().equals("tree")) {
+		if (value.toLowerCase().equals("wood")) {
 			
 			return ResourceType.WOOD;
 		}

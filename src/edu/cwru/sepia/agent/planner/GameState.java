@@ -196,7 +196,7 @@ public class GameState implements Comparable<GameState> {
         			}
     			}    			
     		}
-    		// The peasant does not have cargo and needs to either get to a resource or gather if it is next to one already.
+    		// The peasant does not have cargo and needs to either get to a resource or harvest if it is next to one already.
     		else {
     			for (ResourceNode resource : resources) {
     				Position resourcePos = getResourcePosition(resource);
@@ -207,8 +207,8 @@ public class GameState implements Comparable<GameState> {
     					GameState st = new GameState(this, harvestAction);
     					children.add(harvestAction.apply(st));
     				}
-    				// The peasant needs to move adjacent to the resource.
-    				else {
+    				// The peasant needs to move adjacent to the resource we still need.
+    				else if (needResource(resource)) {
     					List<Position> openPositions = resourcePos.getValidAdjacentPositions(units, resources);
             			
             			for (Position position : openPositions) {    				
@@ -223,6 +223,17 @@ public class GameState implements Comparable<GameState> {
     	}
     	
         return children;
+    }
+    
+    public boolean needResource(ResourceNode resourceNode) {
+    	
+    	switch (resourceNode.getResourceType()) {
+    	case GOLD:
+    		return currentGold < requiredGold;    		
+    	case WOOD:
+    		return currentWood < requiredWood;
+    	}
+    	return false;
     }
     
     /**
