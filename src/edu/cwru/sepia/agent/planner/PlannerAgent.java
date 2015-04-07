@@ -91,48 +91,55 @@ public class PlannerAgent extends Agent {
     private Stack<StripsAction> AstarSearch(GameState startState) {
         
     	Stack<StripsAction> actionPlan = new Stack<StripsAction>();
-    	List<GameState> openSet = new ArrayList<GameState>();
+    	PriorityQueue<GameState> openSet = new PriorityQueue<GameState>();
     	Set<GameState> closedSet = new HashSet<GameState>();
     	GameState current = startState;
     	
     	openSet.add(current);
     	
     	while (!openSet.isEmpty()) {
-    		current = openSet.get(0);
+    		current = openSet.poll();
     		
     		if (current.isGoal()) {
     			
     			return actionPlan;
     		}
-    		//openSet.remove(current);
-    		
-    		else {
-    			List<GameState> neighbors = null;
-    			closedSet.add(current);
-    			Iterator<GameState> i = neighbors.iterator();
+    		openSet.remove(current);
+    		closedSet.add(current);
+    		List<GameState> children = current.generateChildren();
+    		Iterator<GameState> i = children.iterator();
     			
-    			while (i.hasNext()) {
-    				GameState child = i.next();
-    				
-    				if (!closedSet.contains(child)) {
-    					double newGCost = current.getCost() + child.getCost();
-    					
-    					if (newGCost < child.getCost()) {
-    						// child.gCost = newGCost;
-    						// child.fCost = child.gCost + getChebyshevDistance;
-    						// child.cameFrom = current;
-    					}
-    					
-    					if (!openSet.contains(child)) {
-    						openSet.add(child);
-    					}
-    				}
-    			}
-    		}
+			while (i.hasNext()) {
+				GameState child = i.next();
+				
+				if (!closedSet.contains(child)) {
+					double newGCost = current.getCost() + child.getCost();
+					
+					if (newGCost < child.getCost()) {
+						child.gCost = newGCost;
+						child.calculateFunctionalCost();
+						child.setParentState(current);
+					}
+					
+					if (!openSet.contains(child)) {
+						openSet.add(child);
+					}
+				}
+			}
     	}
     	System.out.println("FAILURE: No available path found.");
     	
         return new Stack<StripsAction>();
+    }
+    
+    private Stack<StripsAction> reconstructActionPlan(GameState finalState) {
+    	Stack<StripsAction> actionPlan = new Stack<StripsAction>();
+    	
+    	//while () {
+    		
+    	//}
+    	
+    	return actionPlan;
     }
 
     /**

@@ -1,5 +1,9 @@
 package edu.cwru.sepia.agent.planner;
 
+import edu.cwru.sepia.agent.planner.actions.DepositAction;
+import edu.cwru.sepia.agent.planner.actions.HarvestAction;
+import edu.cwru.sepia.agent.planner.actions.MoveAction;
+import edu.cwru.sepia.agent.planner.actions.StripsAction;
 import edu.cwru.sepia.environment.model.state.ResourceNode.ResourceView;
 import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Unit.UnitView;
@@ -28,6 +32,8 @@ public class GameState implements Comparable<GameState> {
 	
 	private State.StateView stateView;
 	
+	private List<StripsAction> actionHistory;
+	
 	private GameState parent;
 	
 	public List<UnitView> units;
@@ -35,7 +41,7 @@ public class GameState implements Comparable<GameState> {
 	public List<UnitView> peasants;
 	public UnitView townhall;
 	
-	private double fCost, gCost, hCost;
+	public double fCost, gCost, hCost;
 	
 	private int playernum;
 	private int requiredGold;
@@ -50,7 +56,7 @@ public class GameState implements Comparable<GameState> {
 
     /**
      * Construct a GameState from a stateview object. This is used to construct the initial search node. All other
-     * nodes should be constructed from the another constructor you create or by factory functions that you create.
+     * nodes should be constructed from another constructor you create or by factory functions that you create.
      *
      * @param state The current stateview at the time the plan is being created
      * @param playernum The player number of agent that is planning
@@ -73,17 +79,36 @@ public class GameState implements Comparable<GameState> {
     	for (UnitView unit : units) {
     		String unitType = unit.getTemplateView().getName().toLowerCase();
     		
-    		if (unit.getTemplateView().getName().equals("Peasant")) {
+    		if (unitType.equals("peasant")) {
     			this.peasants.add(unit);
     		}
-    		else if (townhall == null && unit.getTemplateView().getName().equals("Townhall"))
+    		else if (townhall == null && unitType.equals("townhall"))
     		{
     			this.townhall = unit;
     		}
     	}
     	
-    	// Calculate the functional cost of the state.
-    	this.fCost = getCost() + heuristic();
+    	calculateFunctionalCost();
+    }
+    
+    /**
+     * 
+     * @param parent
+     */
+    public GameState(GameState parent, List<StripsAction> actionHistory) {
+    	this.stateView = parent.stateView;
+    	this.requiredGold = parent.requiredGold;
+    	this.requiredWood = parent.requiredWood;
+    	this.buildPeasants = parent.buildPeasants;
+    	
+    	this.xExtent = this.stateView.getXExtent();
+    	this.yExtent = this.stateView.getYExtent();
+    	this.units = parent.units;
+    	this.resources = parent.resources;
+    	this.peasants = parent.peasants;
+    	this.townhall = parent.townhall;
+    	
+    	calculateFunctionalCost();
     }
     
     /**
@@ -113,10 +138,76 @@ public class GameState implements Comparable<GameState> {
      * @return A list of the possible successor states and their associated actions
      */
     public List<GameState> generateChildren() {
-        // TODO: Implement me!
+        
     	List<GameState> children = new ArrayList<GameState>();
     	
+    	// Create states for every action for every peasant.
+    	for (UnitView peasant : peasants) {
+    		List<StripsAction> generationActions = new ArrayList<StripsAction>();
+			Position townhallPos = getUnitPosition(townhall);
+			Position peasantPos = getUnitPosition(peasant);
+    		
+    		// If the peasant has cargo it should only be concerned with getting back to the townhall to deposit.
+    		if (peasant.getCargoAmount() > 0) {
+    			
+    			// The peasant is next to the townhall and should deposit.
+    			if (peasantPos.isAdjacent(townhallPos)) {
+    				generationActions.add(new DepositAction(peasant.getID(), peasantPos.getDirection(townhallPos)));
+    				children.add(new GameState(this, generationActions));
+    			}
+    			// The peasant has cargo and needs to get to the townhall to deposit.
+    			else {
+    				List<Position> openPositions = townhallPos.getValidAdjacentPositions(units, resources);
+        			
+        			for (Position position : openPositions) {    				
+        				generationActions.add(new MoveAction(peasant.getID(), position));
+        				children.add(new GameState(this, generationActions));
+        			}
+    			}    			
+    		}
+    		// The peasant does not have cargo and needs to either get to a resource or gather if it is next to one already.
+    		else {
+    			for (ResourceView resource : resources) {
+    				Position resourcePos = getResourcePosition(resource);
+    				
+    				if (peasantPos.isAdjacent(resourcePos)) {
+    					generationActions.add(new HarvestAction(peasant.getID(), peasantPos.getDirection(resourcePos)));
+    					children.add(new GameState(this, generationActions));
+    				}
+    				// The peasant needs to move adjacent to the resource.
+    				else {
+    					List<Position> openPositions = resourcePos.getValidAdjacentPositions(units, resources);
+            			
+            			for (Position position : openPositions) {    				
+            				generationActions.add(new MoveAction(peasant.getID(), position));
+            				children.add(new GameState(this, generationActions));
+            			}
+    				}
+    			}
+    		}
+    	}
+    	
         return children;
+    }
+    
+    /**
+     * Get a Position abstraction of a unit's x and y coordinates.
+     * @param unit
+     * @return
+     */
+    private Position getUnitPosition(UnitView unit) {
+    	
+    	return new Position(unit.getXPosition(), unit.getYPosition());
+    }
+    
+    /**
+     * Get a Position abstraction of a resource's x and y coordinates.
+     * @param resource
+     * @return
+     */
+    private Position getResourcePosition(ResourceView resource) {
+    	
+    	return new Position(resource.getXPosition(), resource.getYPosition());
     }
 
     /**
@@ -129,7 +220,8 @@ public class GameState implements Comparable<GameState> {
      */
     public double heuristic() {
 
-    	double lowestDistance = Double.MAX_VALUE;
+    	//double lowestDistance = Double.MAX_VALUE;
+    	double overallDistance = 0.0;
     	boolean goldGoalReached = currentGold >= requiredGold;
     	boolean woodGoalReached = currentWood >= requiredWood; 
     	
@@ -147,16 +239,24 @@ public class GameState implements Comparable<GameState> {
     		}
     		
     		// Determine the distance to a resource that we actually need.
-    		Position townhallPos = new Position(this.townhall.getXPosition(), this.townhall.getYPosition());
-			Position resourcePos = new Position(resource.getXPosition(), resource.getYPosition());
-			double currentDistance = townhallPos.euclideanDistance(resourcePos);
+    		//Position townhallPos = new Position(this.townhall.getXPosition(), this.townhall.getYPosition());
+			//Position resourcePos = new Position(resource.getXPosition(), resource.getYPosition());
+			//double currentDistance = townhallPos.euclideanDistance(resourcePos);
 			
-			if (currentDistance < lowestDistance) {
-				lowestDistance = currentDistance;
-    		}
+			
+			for (UnitView peasant : peasants) {
+				Position resourcePos = new Position(resource.getXPosition(), resource.getYPosition());
+				Position peasantPos = new Position(peasant.getXPosition(), peasant.getYPosition());
+				
+				overallDistance += peasantPos.euclideanDistance(resourcePos);
+			}			
+			
+//			if (currentDistance < lowestDistance) {
+//				lowestDistance = currentDistance;
+//    		}
     	}
     	
-        return lowestDistance * 10;
+        return overallDistance;
     }
 
     /**
@@ -167,6 +267,12 @@ public class GameState implements Comparable<GameState> {
      * @return The current cost to reach this goal
      */
     public double getCost() {
+    	
+    	// The GCost has already been set.
+    	if (this.gCost > 0) {
+    		
+    		return this.gCost;
+    	}
 
     	double tentativeGCost = 0.0;
     	GameState current = this;
@@ -181,15 +287,13 @@ public class GameState implements Comparable<GameState> {
     }
     
     public double getFunctionalCost() {
+    	calculateFunctionalCost();
     	
-    	if (fCost > 0) {
-    		
-    		return this.fCost;
-    	}
-    	else {
-    		
-    		return getCost() + heuristic();
-    	}    	
+    	return this.fCost;
+    }
+    
+    public void calculateFunctionalCost() {
+    	this.fCost = getCost() + heuristic();
     }
     
     /**

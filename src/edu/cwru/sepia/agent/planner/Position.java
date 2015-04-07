@@ -1,5 +1,7 @@
 package edu.cwru.sepia.agent.planner;
 
+import edu.cwru.sepia.environment.model.state.ResourceNode.ResourceView;
+import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 import edu.cwru.sepia.util.Direction;
 
 import java.util.ArrayList;
@@ -59,6 +61,44 @@ public class Position {
         }
 
         return positions;
+    }
+    
+    /**
+     * Get all adjacent positions that are adjacent, unoccupied, and in bounds.
+     * @return
+     */
+    public List<Position> getValidAdjacentPositions(List<UnitView> units, List<ResourceView> resources) {
+    	List<Position> positions = new ArrayList<Position>();
+    	
+    	for (Direction direction : Direction.values()) {
+    		Position candidate = move(direction);
+    		
+    		if (inBounds(candidate.x, candidate.y)) {
+    			boolean canAdd = true;
+    			
+    			for (UnitView unit : units) {
+    				Position unitPos = new Position(unit.getXPosition(), unit.getYPosition());
+    				
+    				if (candidate.equals(unitPos)) {
+    					canAdd = false;
+    				}
+    			}
+    			
+    			for (ResourceView resource : resources) {
+    				Position resourcePos = new Position(resource.getXPosition(), resource.getYPosition());
+    				
+    				if (candidate.equals(resourcePos)) {
+    					canAdd = false;
+    				}
+    			}
+    			
+    			if (canAdd) {
+    				positions.add(candidate);
+    			}
+    		}
+    	}
+    	
+    	return positions;
     }
 
     /**

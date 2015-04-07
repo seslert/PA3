@@ -5,23 +5,23 @@ import edu.cwru.sepia.util.Direction;
 
 public class HarvestAction implements StripsAction {
 	
-	private Direction townhallDirection;
+	private Direction resourceDirection;
 	
 	private int peasantId;
 	
-	public HarvestAction(int peasantId, Direction townhallDirection) {
+	public HarvestAction(int peasantId, Direction resourceDirection) {
 		
 		this.peasantId = peasantId;
-		this.townhallDirection = townhallDirection;
+		this.resourceDirection = resourceDirection;
 	}
 	
 	/**
 	 * 
 	 * @return
 	 */
-	public Direction getTownhallDirection() {
+	public Direction getResourceDirection() {
 		
-		return this.townhallDirection;			
+		return this.resourceDirection;			
 	}
 	
 	/**

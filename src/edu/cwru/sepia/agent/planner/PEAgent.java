@@ -137,7 +137,7 @@ public class PEAgent extends Agent {
     	if (action instanceof HarvestAction) {
     		HarvestAction harvestAction = (HarvestAction) action;    		
     		
-    		return Action.createPrimitiveGather(harvestAction.getPeasantId(), harvestAction.getTownhallDirection());
+    		return Action.createPrimitiveGather(harvestAction.getPeasantId(), harvestAction.getResourceDirection());
     	}
     	
     	if (action instanceof DepositAction) {
