@@ -52,6 +52,7 @@ public class PlannerAgent extends Agent {
         }
 
         // write the plan to a text file
+        System.out.println("Writing...");
         savePlan(plan);
 
 
@@ -94,6 +95,7 @@ public class PlannerAgent extends Agent {
     	PriorityQueue<GameState> openSet = new PriorityQueue<GameState>();
     	Set<GameState> closedSet = new HashSet<GameState>();
     	GameState current = startState;
+    	GameState previous = null;
     	
     	openSet.add(current);
     	
@@ -104,7 +106,8 @@ public class PlannerAgent extends Agent {
         	System.out.println("CURRENT " + current.toString());
     		
     		if (current.isGoal()) {
-    			System.out.println("WE FOUND A PATH!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    			System.out.println("WE FOUND A PATH!!!");    			
+    			//current.setAstarParent(previous);
     			return reconstructActionPlan(current);
     		}
     		openSet.remove(current);
@@ -119,9 +122,12 @@ public class PlannerAgent extends Agent {
 	        	System.out.println("CHILD " + child.toString());
 				
 				if (!closedSet.contains(child)) {
-					double newGCost = current.getCost() + child.getCost();
+					double newGCost = current.getCost() + child.cost;
 					
 					if (newGCost < child.getCost()) {
+						
+						System.out.println("Added parent in Astar path.");
+						
 						child.gCost = newGCost;
 						child.calculateFunctionalCost();
 						child.setAstarParent(current);
@@ -145,12 +151,15 @@ public class PlannerAgent extends Agent {
      */
     private Stack<StripsAction> reconstructActionPlan(GameState finalState) {
     	Stack<StripsAction> actionPlan = new Stack<StripsAction>();
-    	GameState current = finalState;
+    	GameState current = finalState;    	
     	
     	while (current.astarParent != null) {
+    		System.out.println("Adding " + current.actionHistory.toString() + " to action plan...");
+    		
     		actionPlan.push(current.actionHistory);    		
     		current = current.astarParent;
     	}
+    	System.out.println("Returning rebuilt action plan...");
     	
     	return actionPlan;
     }

@@ -8,7 +8,8 @@ import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 public class MoveAction implements StripsAction {
 	
 	private int peasantId;
-	private Position destination;	
+	private Position destination;
+	private Position origin;
 	
 	/**
 	 * 
@@ -30,6 +31,7 @@ public class MoveAction implements StripsAction {
 		this(peasantId, new Position(x, y));
 	}
 	
+	@Override
 	public int getPeasantId() {
 		
 		return this.peasantId;
@@ -42,7 +44,7 @@ public class MoveAction implements StripsAction {
 	
 	public Position getOrigin() {
 		
-		return null;
+		return this.origin;
 	}
 	
 	@Override
@@ -53,12 +55,13 @@ public class MoveAction implements StripsAction {
 	
 	@Override
 	public GameState apply(GameState state) {
-		
-		System.out.println("Applying move for state: " + state.hashCode());
+		this.origin = state.peasants.get(peasantId).getPosition();
 		
 		if (state.peasants != null) {
 			state.peasants.get(peasantId).setPosition(destination);
 		}
+		state.cost = getOrigin().euclideanDistance(destination);
+		state.gCost += state.cost;
 		
 		return state;
 	}

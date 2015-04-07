@@ -42,6 +42,7 @@ public class DepositAction implements StripsAction {
 	 * 
 	 * @return
 	 */
+	@Override
 	public int getPeasantId() {
 		
 		return this.peasantId;
@@ -49,7 +50,6 @@ public class DepositAction implements StripsAction {
 	
 	@Override
 	public boolean preconditionsMet(GameState state) {
-		//UnitView peasant = state.stateView.getUnit(peasantId);
 		Position peasantPos = state.peasants.get(peasantId).getPosition();
 		Position townhallPos = state.getUnitPosition(state.townhall);
 		
@@ -70,6 +70,8 @@ public class DepositAction implements StripsAction {
 	
 		}
 		state.peasants.get(peasantId).removeCargo();
+		state.cost = 2;
+		state.gCost += state.cost;
 		
 		return state;
 	}

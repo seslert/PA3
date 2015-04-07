@@ -46,6 +46,7 @@ public class HarvestAction implements StripsAction {
 	 * 
 	 * @return
 	 */
+	@Override
 	public int getPeasantId() {
 		
 		return this.peasantId;
@@ -61,7 +62,7 @@ public class HarvestAction implements StripsAction {
 			
 			for (ResourceNode resource : state.resources) {
 				
-				String resourceType = resource.getType().name().toLowerCase();
+				String resourceType = resource.getResourceType().name().toLowerCase();
 				
 				if (resourceType.equals("wood")) {
 					return false;
@@ -81,7 +82,7 @@ public class HarvestAction implements StripsAction {
 			
 			for (ResourceNode resource : state.resources) {
 				
-				String resourceType = resource.getType().name().toLowerCase();
+				String resourceType = resource.getResourceType().name().toLowerCase();
 				
 				if (resourceType.equals("gold")) {
 					return false;
@@ -113,6 +114,8 @@ public class HarvestAction implements StripsAction {
 			break;
 		}
 		state.peasants.get(peasantId).addCargo(resourceNode.reduceAmountRemaining(100));
+		state.cost = 2;
+		state.gCost += state.cost;
 		
 //		if (resourceNode.getAmountRemaining() >= 100) {
 //			resourceNode.reduceAmountRemaining(100);

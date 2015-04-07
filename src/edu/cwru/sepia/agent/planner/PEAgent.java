@@ -1,6 +1,7 @@
 package edu.cwru.sepia.agent.planner;
 
 import edu.cwru.sepia.action.Action;
+import edu.cwru.sepia.action.ActionResult;
 import edu.cwru.sepia.agent.Agent;
 import edu.cwru.sepia.agent.planner.actions.*;
 import edu.cwru.sepia.environment.model.history.History;
@@ -13,6 +14,7 @@ import edu.cwru.sepia.util.Direction;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Stack;
 
@@ -104,20 +106,31 @@ public class PEAgent extends Agent {
      */
     @Override
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
-        // TODO: Implement me!
         
-    	// TODO: Don't know what to do with this yet...
-    	/*
+    	Map<Integer, Action> executionPlan = new LinkedHashMap<Integer, Action>();
+    	
+    	Stack<StripsAction> tempPlan = new Stack<StripsAction>();
+    	
+    	while (!this.plan.isEmpty()) {
+    		tempPlan.push(this.plan.pop());
+    	}
+    
+    	while (!tempPlan.isEmpty()) {
+    		StripsAction nextAction = tempPlan.pop();
+    		executionPlan.put(nextAction.getPeasantId(), createSepiaAction(nextAction));
+    		
+    		System.out.println("INFO: Added " + nextAction.toString() + " to execution plan.");
+    	}
+    	
     	if (stateView.getTurnNumber() != 0) {
     		
     		Map<Integer, ActionResult> actionResults = historyView.getCommandFeedback(playernum, stateView.getTurnNumber() - 1);
     		
     		for (ActionResult result : actionResults.values()) {
-    			System.out.println(result.toString());
+    			System.out.println("RESULT: " + result.toString());
     		}
     	}
-    	*/
-    	return null;
+    	return executionPlan;
     }
 
     /**
