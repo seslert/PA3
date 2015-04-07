@@ -2,11 +2,13 @@ package edu.cwru.sepia.agent.planner;
 
 import edu.cwru.sepia.environment.model.state.ResourceNode;
 import edu.cwru.sepia.environment.model.state.ResourceNode.ResourceView;
+import edu.cwru.sepia.environment.model.state.State.StateView;
 import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 import edu.cwru.sepia.util.Direction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Devin on 3/15/15.
@@ -68,19 +70,20 @@ public class Position {
      * Get all adjacent positions that are adjacent, unoccupied, and in bounds.
      * @return
      */
-    public List<Position> getValidAdjacentPositions(List<UnitView> units, List<ResourceNode> resources) {
+    public List<Position> getValidAdjacentPositions(StateView state, UnitView townHall, Map<Integer, Peasant> peasants, List<ResourceNode> resources) {
     	List<Position> positions = new ArrayList<Position>();
     	
     	for (Direction direction : Direction.values()) {
     		Position candidate = move(direction);
-    		
-    		if (inBounds(candidate.x, candidate.y)) {
+    		if (inBounds(state.getXExtent(), state.getYExtent(), candidate.x, candidate.y)) {
     			boolean canAdd = true;
-    			
-    			for (UnitView unit : units) {
-    				Position unitPos = new Position(unit.getXPosition(), unit.getYPosition());
+    			Position thPos = new Position(townHall.getXPosition(), townHall.getYPosition());
+    			if (candidate.equals(thPos)) {
+    				canAdd = false;
+    			}
+    			for (Peasant peasant : peasants.values()) {
     				
-    				if (candidate.equals(unitPos)) {
+    				if (candidate.equals(peasant.getPosition())) {
     					canAdd = false;
     				}
     			}
@@ -112,6 +115,20 @@ public class Position {
     public boolean inBounds(int xExtent, int yExtent) {
     	
         return (x >= 0 && y >= 0 && x < xExtent && y < yExtent);
+    }
+    
+    /**
+     * Check if a position is within the map. Does not check if the position is occupied
+     *
+     * @param xExtent X dimension size of the map (get this from the StateView object)
+     * @param yExtent Y dimension size of the map (get this from the StateView object)
+     * @param xCord X coordinate of position to check against
+     * @param yCord Y coordinate of position to check against
+     * @return True if in bounds, false otherwise.
+     */
+    public boolean inBounds(int xExtent, int yExtent, int xCord, int yCord) {
+    	
+        return (xCord >= 0 && yCord >= 0 && xCord < xExtent && yCord < yExtent);
     }
 
     /**

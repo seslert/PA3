@@ -14,6 +14,10 @@ public class Peasant {
 	
 	private int carryLimit;
 	
+	public Peasant() {
+		
+	}
+	
 	public Peasant(UnitView peasant, GameState state) {
 		
 		this.id = peasant.getID();
@@ -21,6 +25,26 @@ public class Peasant {
 		this.cargoAmount = 0;
 		this.rootPosition = new Position(peasant.getXPosition(), peasant.getYPosition());
 		this.statePosition = new Position(rootPosition);		
+	}
+	
+	public Peasant Clone(Peasant parent) {
+		Peasant child = new Peasant();
+		child.id = parent.id;
+		child.carryLimit = parent.carryLimit;
+		child.cargoAmount = parent.cargoAmount;
+		child.rootPosition = parent.rootPosition;
+		child.statePosition = parent.statePosition;
+		if (parent.cargoType != null) {
+			
+			if (parent.cargoType == ResourceType.WOOD) {
+				child.cargoType =  ResourceType.WOOD;
+			}
+			else if (parent.cargoType == ResourceType.GOLD) {
+				child.cargoType =  ResourceType.GOLD;
+			}	
+		}	
+		
+		return child;
 	}
 	
 	public int getID() {

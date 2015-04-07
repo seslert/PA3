@@ -98,12 +98,19 @@ public class PlannerAgent extends Agent {
     	GameState previous = null;
     	
     	openSet.add(current);
-    	
     	while (!openSet.isEmpty()) {
-    		current = openSet.poll();
+    		try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		
+    		current = GetLowestFcost(openSet);
+    		openSet.remove(current);
     		
 			// TODO: remove
-        	System.out.println("CURRENT " + current.toString());
+        	System.out.println("\n\nCURRENT State: " + current.toString());
     		
     		if (current.isGoal()) {
     			System.out.println("WE FOUND A PATH!!!");    			
@@ -114,16 +121,19 @@ public class PlannerAgent extends Agent {
     		closedSet.add(current);    		
     		List<GameState> children = current.generateChildren();
     		Iterator<GameState> i = children.iterator();
-    			
+    		
+    		System.out.println(current.hashCode() + " not a goal state, expanding " + children.size() + " children");
+    		int pos = 0;
 			while (i.hasNext()) {
+				pos++;
 				GameState child = i.next();			
 				
 				// TODO: remove
-	        	System.out.println("CHILD " + child.toString());
+	        	System.out.println("CHILD " + pos + "/" + children.size() + " " + child.actionHistory.toString());
 				
 				if (!closedSet.contains(child)) {
 					double newGCost = current.getCost() + child.cost;
-					
+					System.out.println("newGCost: " + newGCost + " vs child.gCost: " + child.getCost());
 					if (newGCost < child.getCost()) {
 						
 						System.out.println("Added parent in Astar path.");
@@ -135,6 +145,7 @@ public class PlannerAgent extends Agent {
 					
 					if (!openSet.contains(child)) {
 						openSet.add(child);
+						System.out.println("testing hash after an add: " + child.hashCode());
 					}
 				}
 			}
@@ -202,5 +213,21 @@ public class PlannerAgent extends Agent {
             if (outputWriter != null)
                 outputWriter.close();
         }
+    }
+    
+    private GameState GetLowestFcost(PriorityQueue<GameState> gameStates) {
+     
+    	GameState lowestFcost = null;
+    	if (gameStates != null) {
+    		
+	    	lowestFcost = gameStates.element();
+	    	
+	    	for (GameState state : gameStates) {
+	    		if (state.fCost < lowestFcost.fCost) {
+	    			lowestFcost = state;
+	    		}
+	    	}
+    	}
+    	return lowestFcost;
     }
 }

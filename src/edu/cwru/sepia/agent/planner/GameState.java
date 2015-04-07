@@ -127,7 +127,7 @@ public class GameState implements Comparable<GameState> {
     	this.cost = 0.0;
     	
     	for (Peasant peasant : parent.peasants.values()) {
-    		this.peasants.put(peasant.getID(), peasant);
+    		this.peasants.put(peasant.getID(), peasant.Clone(peasant));
     	}
     	
     	this.townhall = parent.townhall;
@@ -189,7 +189,7 @@ public class GameState implements Comparable<GameState> {
     			}
     			// The peasant has cargo and needs to get to the townhall to deposit.
     			else {
-    				List<Position> openPositions = townhallPos.getValidAdjacentPositions(units, resources);
+    				List<Position> openPositions = townhallPos.getValidAdjacentPositions(stateView, townhall, peasants, resources);
         			
         			for (Position position : openPositions) {    				
         				MoveAction moveAction = new MoveAction(peasant.getID(), position);
@@ -202,6 +202,7 @@ public class GameState implements Comparable<GameState> {
     		// The peasant does not have cargo and needs to either get to a resource or harvest if it is next to one already.
     		else {
     			for (ResourceNode resource : resources) {
+    				System.out.println("Finding options for resource " + getResourcePosition(resource));
     				Position resourcePos = getResourcePosition(resource);
     				
     				if (peasant.getCargoAmount() == 0 && peasantPos.isAdjacent(resourcePos)) {
@@ -212,9 +213,9 @@ public class GameState implements Comparable<GameState> {
     				}
     				// The peasant needs to move adjacent to the resource we still need.
     				else if (needResource(resource)) {
-    					List<Position> openPositions = resourcePos.getValidAdjacentPositions(units, resources);
-            			
-            			for (Position position : openPositions) {    				
+    					List<Position> openPositions = resourcePos.getValidAdjacentPositions(stateView, townhall, peasants, resources);
+            			for (Position position : openPositions) { 
+            				System.out.println("Position: " + position.toString() + ", parent cost: " + this.cost);
             				MoveAction moveAction = new MoveAction(peasant.getID(), position);
             				//children.add(new GameState(this, moveAction));
             				GameState st = new GameState(this, moveAction);
@@ -301,7 +302,7 @@ public class GameState implements Comparable<GameState> {
 			}
     	}
     	
-        return overallDistance;
+        return overallDistance / 20;
     }
 
     /**
@@ -377,41 +378,54 @@ public class GameState implements Comparable<GameState> {
     @Override
     public boolean equals(Object o) {
     	GameState compare = (GameState) o;
-    	
+    	//System.out.println("test1");
     	if (this.getCurrentGold() != compare.getCurrentGold() || this.getCurrentWood() != compare.getCurrentWood()) {
     		
     		return false;
     	}
-    	
+    	//System.out.println("test2");
     	if (this.peasants.size() != compare.peasants.size() || this.resources.size() != compare.resources.size()) {
     		
     		return false;
     	}
-    	
+    	//System.out.println("test3");
     	// Look at peasant locations and cargo and determine equality.
     	for (Peasant peasant1 : this.peasants.values()) {
     		int numMatches = 0;
     		
     		for (Peasant peasant2 : compare.peasants.values()) {
-    			Position p1 = new Position(peasant1.getXPosition(), peasant1.getYPosition());
-    			Position p2 = new Position(peasant2.getXPosition(), peasant2.getYPosition());
+    			Position p1 = peasant1.getPosition();
+    			Position p2 = peasant2.getPosition();
     			
     			// The peasant has an exact match.
-    			if (p1.equals(p2) && peasant1.getCargoAmount() == peasant2.getCargoAmount() && peasant1.getCargoType() != null && peasant2.getCargoType() != null) {
+    			//System.out.println("p1: " + p1.toString());
+    			//System.out.println("p2: " + p2.toString());
+    			//System.out.println("p1.equals(p2) = " + p1.equals(p2));
+    			//System.out.println("peasant1.getCargoAmount() == peasant2.getCargoAmount() = " + (peasant1.getCargoAmount() == peasant2.getCargoAmount()));
+    			
+    			//System.out.println("peasant1.getCargoType() != null && peasant2.getCargoType() != null = " + (peasant1.getCargoType() != null && peasant2.getCargoType() != null));
+    			
+    			if (p1.equals(p2) && peasant1.getCargoAmount() == peasant2.getCargoAmount()) {
     				
-    				if (peasant1.getCargoType().equals(peasant2.getCargoType())) {    				
+    				if (peasant1.getCargoType() != null && peasant2.getCargoType() != null)
+    				{
+    					if (peasant1.getCargoType().equals(peasant2.getCargoType())) {    				
+        					numMatches++;
+        				}
+    				}
+    				else if (peasant1.getCargoType() == null && peasant2.getCargoType() == null) {
     					numMatches++;
     				}
     			}	
     		}
-    		
+    		//System.out.println("numMatches: " + numMatches);
     		// The peasant does not have exactly one match.
     		if (numMatches != 1) {
     			
     			return false;
     		}
     	}
-    	
+    	//System.out.println("test4");
     	// Look at resource locations, resource types, and amounts remaining to determine equality. 
     	for (ResourceNode resource1 : this.resources) {    		
     		int numMatches = 0;
@@ -431,6 +445,7 @@ public class GameState implements Comparable<GameState> {
     			
     			return false;
     		}
+    		//System.out.println("test5");
     	}
     	
     	return true;
