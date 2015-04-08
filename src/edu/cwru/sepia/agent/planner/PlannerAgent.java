@@ -171,16 +171,20 @@ public class PlannerAgent extends Agent {
      * @return
      */
     private Stack<StripsAction> reconstructActionPlan(GameState finalState) {
+    	Stack<StripsAction> reverseActionPlan = new Stack<StripsAction>();
     	Stack<StripsAction> actionPlan = new Stack<StripsAction>();
+    	
     	GameState current = finalState;    	
     	
     	while (current.astarParent != null) {
-    		System.out.println("Adding " + current.actionHistory.toString() + " to action plan...");
     		
-    		actionPlan.push(current.actionHistory);    		
+    		reverseActionPlan.push(current.actionHistory);    		
     		current = current.astarParent;
     	}
-    	System.out.println("Returning rebuilt action plan...");
+    	
+    	while (!reverseActionPlan.isEmpty()) {
+    		actionPlan.push(reverseActionPlan.pop());
+    	}
     	
     	return actionPlan;
     }

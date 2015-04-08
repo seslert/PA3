@@ -108,15 +108,15 @@ public class PEAgent extends Agent {
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
         
     	Map<Integer, Action> executionPlan = new LinkedHashMap<Integer, Action>();
-    	
-    	Stack<StripsAction> tempPlan = new Stack<StripsAction>();
-    	
-    	while (!this.plan.isEmpty()) {
-    		tempPlan.push(this.plan.pop());
-    	}
+//    	
+//    	Stack<StripsAction> tempPlan = new Stack<StripsAction>();
+//    	
+//    	while (!this.plan.isEmpty()) {
+//    		tempPlan.push(this.plan.pop());
+//    	}
     
-    	while (!tempPlan.isEmpty()) {
-    		StripsAction nextAction = tempPlan.pop();
+    	while (!plan.isEmpty()) {
+    		StripsAction nextAction = plan.pop();
     		executionPlan.put(nextAction.getPeasantId(), createSepiaAction(nextAction));
     		
     		System.out.println("INFO: Added " + nextAction.toString() + " to execution plan.");
