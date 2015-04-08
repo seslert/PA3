@@ -60,12 +60,8 @@ public class MoveAction implements StripsAction {
 		if (state.peasants != null) {
 			state.peasants.get(peasantId).setPosition(destination);
 		}
-		System.out.println("Origin of move: (" + this.origin.x + ", " + this.origin.y + "). Destination of move: (" + this.destination.x + ", " + this.destination.y + ")");
-		System.out.println("state.cost before = " + state.cost);
 		state.cost = getOrigin().euclideanDistance(destination);
-		System.out.println("state.cost = " + state.cost + ", state.gCost = " + state.gCost);
 		state.gCost += state.cost;
-		System.out.println("state.gCost after = " + state.gCost);
 		
 		return state;
 	}

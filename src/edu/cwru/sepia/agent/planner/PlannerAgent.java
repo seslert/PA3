@@ -99,12 +99,20 @@ public class PlannerAgent extends Agent {
     	
     	openSet.add(current);
     	while (!openSet.isEmpty()) {
-    		try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//    		if (current.depth == 11) {
+//    			try {
+//    				Thread.sleep(5000);
+//    			} catch (InterruptedException e) {
+//    				// TODO Auto-generated catch block
+//    				e.printStackTrace();
+//    			}
+//    		}
+//    		try {
+//				Thread.sleep(200);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
     		
     		current = GetLowestFcost(openSet);
     		openSet.remove(current);
@@ -122,30 +130,32 @@ public class PlannerAgent extends Agent {
     		List<GameState> children = current.generateChildren();
     		Iterator<GameState> i = children.iterator();
     		
-    		System.out.println(current.hashCode() + " not a goal state, expanding " + children.size() + " children");
+    		//System.out.println(current.hashCode() + " not a goal state, expanding " + children.size() + " children");
     		int pos = 0;
 			while (i.hasNext()) {
 				pos++;
 				GameState child = i.next();			
 				
 				// TODO: remove
-	        	System.out.println("CHILD " + pos + "/" + children.size() + " " + child.actionHistory.toString());
+	        	//System.out.println("CHILD " + pos + "/" + children.size() + " " + child.actionHistory.toString());
 				
 				if (!closedSet.contains(child)) {
-					double newGCost = current.getCost() + child.cost;
-					System.out.println("newGCost: " + newGCost + " vs child.gCost: " + child.getCost());
-					if (newGCost < child.getCost()) {
+					double newGCost = current.getGCost() + child.cost;
+					//System.out.println("newGCost: " + newGCost + " vs child.gCost: " + child.getGCost());
+					if (newGCost < child.getGCost()) {
 						
-						System.out.println("Added parent in Astar path.");
+						//System.out.println("Added parent in Astar path.");
 						
 						child.gCost = newGCost;
 						child.calculateFunctionalCost();
+						//System.out.println("newFCost for child " + child.hashCode() + " " + child.fCost);
 						child.setAstarParent(current);
 					}
 					
 					if (!openSet.contains(child)) {
+						//System.out.println("child " + pos + "/" + children.size() + " fCost " + child.fCost);
 						openSet.add(child);
-						System.out.println("testing hash after an add: " + child.hashCode());
+						//System.out.println("testing hash after an add: " + child.hashCode());
 					}
 				}
 			}

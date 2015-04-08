@@ -33,6 +33,8 @@ import java.util.Map;
  */
 public class GameState implements Comparable<GameState> {
 	
+	public int depth;
+	
 	public State.StateView stateView;
 	public StripsAction actionHistory;
 	public GameState parent;
@@ -75,6 +77,7 @@ public class GameState implements Comparable<GameState> {
     	this.units = stateView.getAllUnits();
     	this.gCost = 0.0;
     	this.cost = 0.0;
+    	this.fCost = Double.MAX_VALUE;
     	//this.resources = stateView.getAllResourceNodes();
     	
     	this.peasants = new HashMap<Integer, Peasant>();
@@ -102,7 +105,7 @@ public class GameState implements Comparable<GameState> {
     	
     	//applyAction();
     	//calculateGCost();
-    	calculateFunctionalCost();
+    	//calculateFunctionalCost();
     }
     
     /**
@@ -110,6 +113,9 @@ public class GameState implements Comparable<GameState> {
      * @param parent
      */
     public GameState(GameState parent, StripsAction actionHistory) {
+    	
+    	this.depth = parent.depth + 1;
+    	
     	this.actionHistory = actionHistory;
     	this.parent = parent;
     	this.stateView = parent.stateView;
@@ -125,6 +131,7 @@ public class GameState implements Comparable<GameState> {
     	this.peasants = new HashMap<Integer, Peasant>();
     	this.gCost = Double.MAX_VALUE; //parent.gCost;
     	this.cost = 0.0;
+    	this.fCost = Double.MAX_VALUE;
     	
     	for (Peasant peasant : parent.peasants.values()) {
     		this.peasants.put(peasant.getID(), peasant.Clone(peasant));
@@ -139,7 +146,7 @@ public class GameState implements Comparable<GameState> {
     	//System.out.println("Peasant " + peasants.get(1).getID() + " position after: " + peasants.get(1).getPosition().toString());
     	
     	//calculateGCost();
-    	calculateFunctionalCost();    	
+    	//calculateFunctionalCost();    	
     }
     
     /**
@@ -202,7 +209,6 @@ public class GameState implements Comparable<GameState> {
     		// The peasant does not have cargo and needs to either get to a resource or harvest if it is next to one already.
     		else {
     			for (ResourceNode resource : resources) {
-    				System.out.println("Finding options for resource " + getResourcePosition(resource));
     				Position resourcePos = getResourcePosition(resource);
     				
     				if (peasant.getCargoAmount() == 0 && peasantPos.isAdjacent(resourcePos)) {
@@ -215,7 +221,6 @@ public class GameState implements Comparable<GameState> {
     				else if (needResource(resource)) {
     					List<Position> openPositions = resourcePos.getValidAdjacentPositions(stateView, townhall, peasants, resources);
             			for (Position position : openPositions) { 
-            				System.out.println("Position: " + position.toString() + ", parent cost: " + this.cost);
             				MoveAction moveAction = new MoveAction(peasant.getID(), position);
             				//children.add(new GameState(this, moveAction));
             				GameState st = new GameState(this, moveAction);
@@ -237,7 +242,7 @@ public class GameState implements Comparable<GameState> {
     	case WOOD:
     		return currentWood < requiredWood;
     	}
-    	return false;
+    	return true;
     }
     
     /**
@@ -277,32 +282,37 @@ public class GameState implements Comparable<GameState> {
      * @return The value estimated remaining cost to reach a goal state from this state.
      */
     public double heuristic() {
-    	double overallDistance = 0.0;
-    	boolean goldGoalReached = currentGold >= requiredGold;
-    	boolean woodGoalReached = currentWood >= requiredWood; 
     	
-    	for (ResourceNode resource : resources) {
-    		String resourceType = resource.getType().name().toLowerCase();
+    	double overallH = 0.0;
+    	
+    	for (Peasant peasant : peasants.values()) {
     		
-    		// We already have enough wood.  Move to the next resource.
-    		if (woodGoalReached && resourceType.equals("wood")) {
-    			break;
+    		// peasant needs to deposit resource in townHall
+    		if (peasant.getCargoAmount() > 0 && actionHistory instanceof DepositAction) {
+    			overallH += 0;
     		}
     		
-    		// We already have enough gold.  Move to the next resource.
-    		if (goldGoalReached && resourceType.equals("gold")) {
-    			break;
+    		// peasant needs to move to townHall to be able to deposit resources
+    		if (peasant.getCargoAmount() > 0 && actionHistory instanceof MoveAction) {
+    			overallH += 25;
     		}
     		
-    		// Determine the distance to a resource that we actually need.
-			for (Peasant peasant : peasants.values()) {
-				Position resourcePos = getResourcePosition(resource);//new Position(resource.getXPosition(), resource.getYPosition());
-				Position peasantPos = peasant.getPosition();
-				overallDistance += peasantPos.euclideanDistance(resourcePos);
-			}
+    		// peasant needs to harvest resource
+    		if (peasant.getCargoAmount() == 0 && actionHistory instanceof HarvestAction) {
+    			overallH += 50;
+    		}
+    		
+    		// peasant needs to move to a resource to be able to harvest it
+    		if (peasant.getCargoAmount() == 0 && actionHistory instanceof MoveAction) {
+    			overallH += 100;
+    		}
     	}
     	
-        return overallDistance / 20;
+    	// encourage states that have gathered more resources
+    	//overallH += 1 / (Math.pow((currentWood + currentGold + 1), depth)) * 5500;
+    	overallH += 1000 - 2.5 * (currentWood + currentGold);
+
+        return overallH / peasants.size();
     }
 
     /**
@@ -312,30 +322,11 @@ public class GameState implements Comparable<GameState> {
      *
      * @return The current cost to reach this goal
      */
-    public double getCost() {
-    	
-    	// The GCost hasn't been set.
-    	if (this.gCost <= 0) {
-    		calculateGCost();
-    	}
+    public double getGCost() {
     	
     	return this.gCost;
     }
-    
-    /**
-     * 
-     */
-    public void calculateGCost() {
-    	double tentativeGCost = 0.0;
-    	GameState current = this;
-    	
-    	while (current.parent != null) {
-    		tentativeGCost++;
-    		current = current.parent;
-    	}
-    	this.gCost = tentativeGCost;
-    }
-    
+     
     public double getFunctionalCost() {
     	calculateFunctionalCost();
     	
@@ -343,7 +334,7 @@ public class GameState implements Comparable<GameState> {
     }
     
     public void calculateFunctionalCost() {
-    	this.fCost = getCost() + heuristic();
+    	this.fCost = getGCost() + heuristic();
     }
 
     /**
@@ -480,7 +471,7 @@ public class GameState implements Comparable<GameState> {
         for (ResourceNode resource : resources) {
         	hashCode += resource.getAmountRemaining();
         }
-        hashCode /= (int)getFunctionalCost();
+        hashCode /= ((int)getFunctionalCost() + 1);
     	
         return hashCode;
     }
@@ -498,14 +489,11 @@ public class GameState implements Comparable<GameState> {
     @Override
     public String toString() {
     	StringBuilder builder = new StringBuilder();
-    	builder.append("GameState " + hashCode() + "\n");
+    	builder.append("GameState " + hashCode() + ", depth " + depth + "\n");
     	builder.append("Cost to this state: " + cost + "\n");
     	builder.append("GCost: " + gCost + "\n");
     	builder.append("FCost: " + getFunctionalCost() + "\n");
-    	builder.append("Num Peasants: " + peasants.size() + "\n");
-    	builder.append("Num Resources: " + resources.size() + "\n");
-    	builder.append("Current Gold: " + getCurrentGold() + "\n");
-    	builder.append("Current Wood: " + getCurrentWood() + "\n");
+    	builder.append("Current Gold: " + getCurrentGold() + ", current Wood: " + getCurrentWood() + "\n");
     	
     	if (actionHistory != null) {
     		builder.append("Action History: " + actionHistory.toString() + "\n");
