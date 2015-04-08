@@ -52,7 +52,6 @@ public class PlannerAgent extends Agent {
         }
 
         // write the plan to a text file
-        System.out.println("Writing...");
         savePlan(plan);
 
 

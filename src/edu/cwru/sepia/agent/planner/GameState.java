@@ -352,17 +352,14 @@ public class GameState implements Comparable<GameState> {
     @Override
     public boolean equals(Object o) {
     	GameState compare = (GameState) o;
-    	//System.out.println("test1");
     	if (this.getCurrentGold() != compare.getCurrentGold() || this.getCurrentWood() != compare.getCurrentWood()) {
     		
     		return false;
     	}
-    	//System.out.println("test2");
     	if (this.peasants.size() != compare.peasants.size() || this.resources.size() != compare.resources.size()) {
     		
     		return false;
     	}
-    	//System.out.println("test3");
     	// Look at peasant locations and cargo and determine equality.
     	for (Peasant peasant1 : this.peasants.values()) {
     		int numMatches = 0;
@@ -372,13 +369,6 @@ public class GameState implements Comparable<GameState> {
     			Position p2 = peasant2.getPosition();
     			
     			// The peasant has an exact match.
-    			//System.out.println("p1: " + p1.toString());
-    			//System.out.println("p2: " + p2.toString());
-    			//System.out.println("p1.equals(p2) = " + p1.equals(p2));
-    			//System.out.println("peasant1.getCargoAmount() == peasant2.getCargoAmount() = " + (peasant1.getCargoAmount() == peasant2.getCargoAmount()));
-    			
-    			//System.out.println("peasant1.getCargoType() != null && peasant2.getCargoType() != null = " + (peasant1.getCargoType() != null && peasant2.getCargoType() != null));
-    			
     			if (p1.equals(p2) && peasant1.getCargoAmount() == peasant2.getCargoAmount()) {
     				
     				if (peasant1.getCargoType() != null && peasant2.getCargoType() != null)
@@ -392,21 +382,19 @@ public class GameState implements Comparable<GameState> {
     				}
     			}	
     		}
-    		//System.out.println("numMatches: " + numMatches);
     		// The peasant does not have exactly one match.
     		if (numMatches != 1) {
     			
     			return false;
     		}
     	}
-    	//System.out.println("test4");
     	// Look at resource locations, resource types, and amounts remaining to determine equality. 
     	for (ResourceNode resource1 : this.resources) {    		
     		int numMatches = 0;
     		
     		for (ResourceNode resource2 : compare.resources) {
-    			Position p1 = getResourcePosition(resource1); //new Position(resource1.getXPosition(), resource1.getYPosition());
-    			Position p2 = getResourcePosition(resource2); //new Position(resource2.getXPosition(), resource2.getYPosition());
+    			Position p1 = getResourcePosition(resource1);
+    			Position p2 = getResourcePosition(resource2);
     			
     			// The resource has an exact match.
     			if (p1.equals(p2) && resource1.getAmountRemaining() == resource2.getAmountRemaining() && resource1.getType().equals(resource2.getType())) {
@@ -419,7 +407,6 @@ public class GameState implements Comparable<GameState> {
     			
     			return false;
     		}
-    		//System.out.println("test5");
     	}
     	
     	return true;

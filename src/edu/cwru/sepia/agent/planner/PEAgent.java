@@ -109,7 +109,6 @@ public class PEAgent extends Agent {
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
         
     	Map<Integer, Action> executionPlan = new LinkedHashMap<Integer, Action>();
-		System.out.println("Turn: " + stateView.getTurnNumber());
 		
 		if (stateView.getTurnNumber() == 0) {
 			StripsAction nextAction = plan.pop();
@@ -123,7 +122,6 @@ public class PEAgent extends Agent {
 				if (result.getFeedback() != ActionFeedback.INCOMPLETE) {
 					StripsAction nextAction = plan.pop();    	
 		    		executionPlan.put(nextAction.getPeasantId(), createSepiaAction(nextAction));
-					System.out.println(result.toString());
 				}
     		}
 		}
