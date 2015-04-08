@@ -127,7 +127,7 @@ public class HarvestAction implements StripsAction {
 	@Override
 	public String toString() {
 		
-		return "ACTION: HARVEST PEASANT: " + peasantId + " RESOURCE: " + resourceType.toString() + "\n";
+		return "ACTION: HARVEST( Peasant " + peasantId + " | " + resourceType.toString() + " )" + "\n";
 	}
 
 }

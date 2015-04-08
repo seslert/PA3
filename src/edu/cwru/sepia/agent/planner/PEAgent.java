@@ -120,7 +120,10 @@ public class PEAgent extends Agent {
 			for (ActionResult result : actionResults.values()) {
 				
 				if (result.getFeedback() != ActionFeedback.INCOMPLETE) {
-					StripsAction nextAction = plan.pop();    	
+					StripsAction nextAction = plan.pop();   
+					
+					System.out.println("Next Action to Execute: " + nextAction.toString());
+					
 		    		executionPlan.put(nextAction.getPeasantId(), createSepiaAction(nextAction));
 				}
     		}
@@ -152,6 +155,11 @@ public class PEAgent extends Agent {
     		DepositAction depositAction = (DepositAction) action;
     		
     		return Action.createPrimitiveDeposit(depositAction.getPeasantId(), depositAction.getResourceDirection());
+    	}
+    	
+    	if (action instanceof BuildPeasant) {
+    		BuildPeasant buildPeasant = (BuildPeasant) action;
+    		return Action.createPrimitiveProduction(buildPeasant.getTownhallId(), buildPeasant.getPeasantId());
     	}
         
     	return null;

@@ -69,7 +69,7 @@ public class MoveAction implements StripsAction {
 	@Override
 	public String toString() {
 		
-		return new String("ACTION: MOVE PEASANT: " + peasantId + " DESTINATION: " + destination.toString()) + "\n";
+		return new String("ACTION: MOVE( Peasant " + peasantId + " | " + destination.toString()) + " )" + "\n";
 	}
 
 }

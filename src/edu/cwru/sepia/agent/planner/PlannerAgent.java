@@ -97,32 +97,35 @@ public class PlannerAgent extends Agent {
     	boolean slow = false;
     	boolean reset = false;
     	
+    	// TODO: Leave this...
+    	System.out.println("Planning...");
+    	
     	while (!openSet.isEmpty()) {    		
     		current = GetLowestFcost(openSet);
-    		if (current.actionHistory instanceof BuildPeasant && reset == false) {
-    			slow = true;
-    			reset = true;
-    		}
-    		else if (current.getGold() != 400){
-    			reset = false;
-    		}
-    		if (slow) {
-    			try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-    			slow = false;
-    			reset = true;
-    		}
+//    		if (current.actionHistory instanceof BuildPeasant && reset == false) {
+//    			slow = true;
+//    			reset = true;
+//    		}
+//    		else if (current.getGold() != 400){
+//    			reset = false;
+//    		}
+//    		if (slow) {
+//    			try {
+//					Thread.sleep(500);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//    			slow = false;
+//    			reset = true;
+//    		}
     		openSet.remove(current);
     		
 			// TODO: remove
         	System.out.println("\n\nCURRENT State: " + current.toString());
     		
     		if (current.isGoal()) {
-    			System.out.println("WE FOUND A PATH!!!");    			
+    			System.out.println("Path found.");    			
     			return reconstructActionPlan(current);
     		}
     		openSet.remove(current);
@@ -186,8 +189,8 @@ public class PlannerAgent extends Agent {
         if (plan == null) {
             System.err.println("Cannot save null plan");
             return;
-        }
-
+        }        
+        System.out.println("Saving plan to file...");
         File outputDir = new File("saves");
         outputDir.mkdirs();
 
@@ -211,6 +214,7 @@ public class PlannerAgent extends Agent {
             if (outputWriter != null)
                 outputWriter.close();
         }
+        System.out.println("Plan saved successfully.");
     }
     
     private GameState GetLowestFcost(PriorityQueue<GameState> gameStates) {

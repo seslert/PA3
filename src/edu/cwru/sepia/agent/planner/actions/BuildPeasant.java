@@ -27,6 +27,11 @@ public class BuildPeasant implements StripsAction {
 	@Override
 	public int getPeasantId() {
 		
+		return this.peasantId;
+	}
+	
+	public int getTownhallId() {
+		
 		return this.townhallId;
 	}
 	

@@ -79,7 +79,7 @@ public class DepositAction implements StripsAction {
 	@Override
 	public String toString() {
 		
-		return "ACTION: DEPOSIT PEASANT: " + peasantId + " RESOURCE: " + resourceType.toString() + "\n";
+		return "ACTION: DEPOSIT( Peasant " + peasantId + " | " + resourceType.toString() + " )" + "\n";
 	}
 
 }

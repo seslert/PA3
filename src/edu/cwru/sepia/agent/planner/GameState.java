@@ -86,24 +86,9 @@ public class GameState implements Comparable<GameState> {
     	this.peasants = new HashMap<Integer, Peasant>();
     	this.resources = new ArrayList<ResourceNode>();
     	
-    	// Get the peasant units and the townhall
-    	for (UnitView unit : units) {
-    		String unitType = unit.getTemplateView().getName().toLowerCase();
-    		
-    		if (unitType.equals("peasant")) {
-    			Peasant peasant = new Peasant(unit);
-    			peasant.setPosition(new Position(unit.getXPosition(), unit.getYPosition()));
-    			this.peasants.put(unit.getID(), peasant);
-    		}
-    		else if (townhall == null && unitType.equals("townhall"))
-    		{
-    			this.townhall = unit;
-    		}
-    	}
-    	
-    	for (ResourceView r : stateView.getAllResourceNodes()) {    		
-    		this.resources.add(new ResourceNode(r.getType(), r.getXPosition(), r.getYPosition(), r.getAmountRemaining(), r.getID()));
-    	}
+    	// Find and bind all units and resources in the state.
+    	discoverUnits(state);
+    	discoverResources(state);
     	
     	this.food = stateView.getSupplyCap(townhall.getID());
     	this.grossGold = 0;
@@ -130,7 +115,7 @@ public class GameState implements Comparable<GameState> {
     	this.xExtent = this.stateView.getXExtent();
     	this.yExtent = this.stateView.getYExtent();
     	this.units = parent.units;
-    	this.resources = new ArrayList<ResourceNode>(parent.resources);
+    	//this.resources = new ArrayList<ResourceNode>(parent.resources);
     	this.peasants = new HashMap<Integer, Peasant>();
     	this.gCost = Double.MAX_VALUE;
     	this.cost = 0.0;
@@ -139,11 +124,43 @@ public class GameState implements Comparable<GameState> {
     	for (Peasant peasant : parent.peasants.values()) {
     		this.peasants.put(peasant.getID(), peasant.Clone(peasant));
     	}
+    	
+    	this.resources = new ArrayList<ResourceNode>();
+    	discoverResources(stateView);
+    	
     	this.townhall = parent.townhall;	
     	
     	this.food = parent.food;
     	this.grossGold = parent.grossGold;
     	this.grossWood = parent.grossWood;
+    }
+    
+    private void discoverUnits(State.StateView s) {
+    	
+    	for (UnitView unit : s.getAllUnits()) {
+    		String unitType = unit.getTemplateView().getName().toLowerCase();
+    		
+    		if (unitType.equals("peasant")) {
+    			Peasant peasant = new Peasant(unit);
+    			peasant.setPosition(new Position(unit.getXPosition(), unit.getYPosition()));
+    			this.peasants.put(unit.getID(), peasant);
+    		}
+    		else if (townhall == null && unitType.equals("townhall"))
+    		{
+    			this.townhall = unit;
+    		}
+    	}
+    }
+    
+    /**
+     * Determines all remaining resources in the state.
+     * @param s
+     */
+    private void discoverResources(State.StateView s) {
+    	
+    	for (ResourceView r : s.getAllResourceNodes()) {    		
+    		this.resources.add(new ResourceNode(r.getType(), r.getXPosition(), r.getYPosition(), r.getAmountRemaining(), r.getID()));
+    	}
     }
     
     /**
@@ -336,7 +353,7 @@ public class GameState implements Comparable<GameState> {
     	overallH += 2.5 * (requiredWood + requiredGold + 400 * (2 - food)) - 2.5 * (grossWood + grossGold);
     	
     	// Encourage states that have multiple peasants (assuming that the maximum number of peasants is 3)
-    	//overallH = overallH * (4 - peasants.size());
+    	overallH = overallH / Math.pow(2, peasants.size());
 
         return overallH / peasants.size();
     }
@@ -519,8 +536,9 @@ public class GameState implements Comparable<GameState> {
     	builder.append("Cost to this state: " + cost + "\n");
     	builder.append("GCost: " + gCost + "\n");
     	builder.append("FCost: " + getFunctionalCost() + "\n");
-    	builder.append("Current Gold: " + getCurrentGold() + ", current Wood: " + getCurrentWood() + "\n");
-    	builder.append("Number peasants: " + peasants.size() + ", number resources: " + resources.size() + "\n");
+    	builder.append("Current Gold: " + getCurrentGold() + " | Current Wood: " + getCurrentWood() + "\n");
+    	builder.append("Gross Gold: " + grossGold + " | Gross Wood: " + grossWood + "\n");
+    	builder.append("Active Peasants: " + peasants.size() + " | Remaining Resources: " + resources.size() + "\n");
     	
     	if (actionHistory != null) {
     		builder.append("Action History: " + actionHistory.toString() + "\n");
