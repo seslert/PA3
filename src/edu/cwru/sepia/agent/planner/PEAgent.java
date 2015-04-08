@@ -109,32 +109,22 @@ public class PEAgent extends Agent {
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
         
     	Map<Integer, Action> executionPlan = new LinkedHashMap<Integer, Action>();
-//    	
-//    	Stack<StripsAction> tempPlan = new Stack<StripsAction>();
-//    	
-//    	while (!this.plan.isEmpty()) {
-//    		tempPlan.push(this.plan.pop());
-//    	}
-    
-    	//while (!plan.isEmpty()) {
-    		
-    		//System.out.println("INFO: Added " + nextAction.toString() + " to execution plan.");
-    		System.out.println("Turn: " + stateView.getTurnNumber());
-    		
-    		if (stateView.getTurnNumber() == 0) {
-    			StripsAction nextAction = plan.pop();
-    			executionPlan.put(nextAction.getPeasantId(), createSepiaAction(nextAction));
-    		}
-    		else if (!plan.isEmpty()) {    			
-    			Map<Integer, ActionResult> actionResults = historyView.getCommandFeedback(playernum, stateView.getTurnNumber() - 1);
-    			
-    			for (ActionResult result : actionResults.values()) {
-    				
-    				if (result.getFeedback() != ActionFeedback.INCOMPLETE) {
-    					StripsAction nextAction = plan.pop();    	
-    		    		executionPlan.put(nextAction.getPeasantId(), createSepiaAction(nextAction));
-    					System.out.println(result.toString());
-    				}
+		System.out.println("Turn: " + stateView.getTurnNumber());
+		
+		if (stateView.getTurnNumber() == 0) {
+			StripsAction nextAction = plan.pop();
+			executionPlan.put(nextAction.getPeasantId(), createSepiaAction(nextAction));
+		}
+		else if (!plan.isEmpty()) {    			
+			Map<Integer, ActionResult> actionResults = historyView.getCommandFeedback(playernum, stateView.getTurnNumber() - 1);
+			
+			for (ActionResult result : actionResults.values()) {
+				
+				if (result.getFeedback() != ActionFeedback.INCOMPLETE) {
+					StripsAction nextAction = plan.pop();    	
+		    		executionPlan.put(nextAction.getPeasantId(), createSepiaAction(nextAction));
+					System.out.println(result.toString());
+				}
     		}
 		}
     	return executionPlan;

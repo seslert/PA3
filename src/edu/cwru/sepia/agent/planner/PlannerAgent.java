@@ -90,39 +90,20 @@ public class PlannerAgent extends Agent {
      * @return The plan or null if no plan is found.
      */
     private Stack<StripsAction> AstarSearch(GameState startState) {
-        
-    	Stack<StripsAction> actionPlan = new Stack<StripsAction>();
     	PriorityQueue<GameState> openSet = new PriorityQueue<GameState>();
     	Set<GameState> closedSet = new HashSet<GameState>();
     	GameState current = startState;
-    	GameState previous = null;
-    	
     	openSet.add(current);
-    	while (!openSet.isEmpty()) {
-//    		if (current.depth == 11) {
-//    			try {
-//    				Thread.sleep(5000);
-//    			} catch (InterruptedException e) {
-//    				// TODO Auto-generated catch block
-//    				e.printStackTrace();
-//    			}
-//    		}
-//    		try {
-//				Thread.sleep(200);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-    		
+    	
+    	while (!openSet.isEmpty()) {    		
     		current = GetLowestFcost(openSet);
     		openSet.remove(current);
     		
 			// TODO: remove
-        	System.out.println("\n\nCURRENT State: " + current.toString());
+        	//System.out.println("\n\nCURRENT State: " + current.toString());
     		
     		if (current.isGoal()) {
     			System.out.println("WE FOUND A PATH!!!");    			
-    			//current.setAstarParent(previous);
     			return reconstructActionPlan(current);
     		}
     		openSet.remove(current);
@@ -130,32 +111,20 @@ public class PlannerAgent extends Agent {
     		List<GameState> children = current.generateChildren();
     		Iterator<GameState> i = children.iterator();
     		
-    		//System.out.println(current.hashCode() + " not a goal state, expanding " + children.size() + " children");
-    		int pos = 0;
-			while (i.hasNext()) {
-				pos++;
-				GameState child = i.next();			
-				
-				// TODO: remove
-	        	//System.out.println("CHILD " + pos + "/" + children.size() + " " + child.actionHistory.toString());
+			while (i.hasNext()) {			
+				GameState child = i.next();							
 				
 				if (!closedSet.contains(child)) {
 					double newGCost = current.getGCost() + child.cost;
-					//System.out.println("newGCost: " + newGCost + " vs child.gCost: " + child.getGCost());
-					if (newGCost < child.getGCost()) {
-						
-						//System.out.println("Added parent in Astar path.");
-						
+					
+					if (newGCost < child.getGCost()) {						
 						child.gCost = newGCost;
 						child.calculateFunctionalCost();
-						//System.out.println("newFCost for child " + child.hashCode() + " " + child.fCost);
 						child.setAstarParent(current);
 					}
 					
 					if (!openSet.contains(child)) {
-						//System.out.println("child " + pos + "/" + children.size() + " fCost " + child.fCost);
 						openSet.add(child);
-						//System.out.println("testing hash after an add: " + child.hashCode());
 					}
 				}
 			}
@@ -181,11 +150,7 @@ public class PlannerAgent extends Agent {
     		reverseActionPlan.push(current.actionHistory);    		
     		current = current.astarParent;
     	}
-    	
-//    	while (!reverseActionPlan.isEmpty()) {
-//    		actionPlan.push(reverseActionPlan.pop());
-//    	}
-    	
+
     	return reverseActionPlan;
     }
 
