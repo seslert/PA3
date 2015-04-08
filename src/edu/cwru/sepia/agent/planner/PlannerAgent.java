@@ -2,6 +2,7 @@ package edu.cwru.sepia.agent.planner;
 
 import edu.cwru.sepia.action.Action;
 import edu.cwru.sepia.agent.Agent;
+import edu.cwru.sepia.agent.planner.actions.BuildPeasant;
 import edu.cwru.sepia.agent.planner.actions.StripsAction;
 import edu.cwru.sepia.environment.model.history.History;
 import edu.cwru.sepia.environment.model.state.State;
@@ -93,13 +94,25 @@ public class PlannerAgent extends Agent {
     	Set<GameState> closedSet = new HashSet<GameState>();
     	GameState current = startState;
     	openSet.add(current);
+    	boolean slow = false;
     	
     	while (!openSet.isEmpty()) {    		
     		current = GetLowestFcost(openSet);
+    		if (current.actionHistory instanceof BuildPeasant) {
+    			slow = true;
+    		}
+    		if (slow) {
+    			try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    		}
     		openSet.remove(current);
     		
 			// TODO: remove
-        	//System.out.println("\n\nCURRENT State: " + current.toString());
+        	System.out.println("\n\nCURRENT State: " + current.toString());
     		
     		if (current.isGoal()) {
     			System.out.println("WE FOUND A PATH!!!");    			

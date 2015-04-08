@@ -6,8 +6,7 @@ import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 public class Peasant {
 	
 	private int id;
-	private int cargoAmount;	
-	private GameState state;
+	private int cargoAmount;
 	private Position rootPosition;
 	private Position statePosition;
 	private ResourceType cargoType;
@@ -18,13 +17,22 @@ public class Peasant {
 		
 	}
 	
-	public Peasant(UnitView peasant, GameState state) {
+	public Peasant(UnitView peasant) {
 		
 		this.id = peasant.getID();
 		this.carryLimit = 100;
 		this.cargoAmount = 0;
 		this.rootPosition = new Position(peasant.getXPosition(), peasant.getYPosition());
-		this.statePosition = new Position(rootPosition);		
+		this.statePosition = new Position(this.rootPosition);		
+	}
+	
+	public Peasant(int peasantId, Position position) {
+		
+		this.id = peasantId;
+		this.carryLimit = 100;
+		this.cargoAmount = 0;
+		this.rootPosition = position;
+		this.statePosition = new Position(this.rootPosition);
 	}
 	
 	public Peasant Clone(Peasant parent) {

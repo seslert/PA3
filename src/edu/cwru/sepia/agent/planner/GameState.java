@@ -1,5 +1,6 @@
 package edu.cwru.sepia.agent.planner;
 
+import edu.cwru.sepia.agent.planner.actions.BuildPeasant;
 import edu.cwru.sepia.agent.planner.actions.DepositAction;
 import edu.cwru.sepia.agent.planner.actions.HarvestAction;
 import edu.cwru.sepia.agent.planner.actions.MoveAction;
@@ -68,6 +69,7 @@ public class GameState implements Comparable<GameState> {
      */
     public GameState(State.StateView state, int playernum, int requiredGold, int requiredWood, boolean buildPeasants) {
         
+    	this.playernum = playernum;
     	this.stateView = state; 
     	this.requiredGold = requiredGold;
     	this.requiredWood = requiredWood;
@@ -86,7 +88,7 @@ public class GameState implements Comparable<GameState> {
     		String unitType = unit.getTemplateView().getName().toLowerCase();
     		
     		if (unitType.equals("peasant")) {
-    			Peasant peasant = new Peasant(unit, this);
+    			Peasant peasant = new Peasant(unit);
     			peasant.setPosition(new Position(unit.getXPosition(), unit.getYPosition()));
     			this.peasants.put(unit.getID(), peasant);
     		}
@@ -109,6 +111,7 @@ public class GameState implements Comparable<GameState> {
     	
     	this.depth = parent.depth + 1;
     	
+    	this.playernum = parent.playernum;
     	this.actionHistory = actionHistory;
     	this.parent = parent;
     	this.stateView = parent.stateView;
@@ -161,6 +164,13 @@ public class GameState implements Comparable<GameState> {
     public List<GameState> generateChildren() {
         
     	List<GameState> children = new ArrayList<GameState>();
+    	
+    	// Generate BuildPeasant state if preconditions met
+    	if (buildPeasants && currentGold >= 400 && stateView.getSupplyCap(townhall.getID()) > 0) {
+    		BuildPeasant buildPeasant = new BuildPeasant(townhall.getID());
+    		GameState st = new GameState(this, buildPeasant);
+			children.add(buildPeasant.apply(st));
+    	}
     	
     	// Create states for every action for every peasant.
     	for (Peasant peasant : peasants.values()) {    		
@@ -253,8 +263,20 @@ public class GameState implements Comparable<GameState> {
     	currentGold += amount;
     }
     
+    public void removeGold(int amount) {
+    	currentGold -= amount;
+    }
+    
     public void addWood(int amount) {
     	currentWood += amount;
+    }
+    
+    public int getGold() {
+    	return this.currentGold;
+    }
+    
+    public int getPlayernum() {
+    	return this.playernum;
     }
 
     /**
@@ -289,6 +311,11 @@ public class GameState implements Comparable<GameState> {
     		if (peasant.getCargoAmount() == 0 && actionHistory instanceof MoveAction) {
     			overallH += 100;
     		}
+    	}
+    	
+    	// Encourage states that build peasants
+    	if (!(this.actionHistory instanceof BuildPeasant)) {
+    		overallH *= 2;
     	}
     	
     	// Encourage states that have gathered more resources.
