@@ -182,11 +182,11 @@ public class PlannerAgent extends Agent {
     		current = current.astarParent;
     	}
     	
-    	while (!reverseActionPlan.isEmpty()) {
-    		actionPlan.push(reverseActionPlan.pop());
-    	}
+//    	while (!reverseActionPlan.isEmpty()) {
+//    		actionPlan.push(reverseActionPlan.pop());
+//    	}
     	
-    	return actionPlan;
+    	return reverseActionPlan;
     }
 
     /**

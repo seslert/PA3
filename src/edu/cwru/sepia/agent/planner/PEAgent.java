@@ -1,6 +1,7 @@
 package edu.cwru.sepia.agent.planner;
 
 import edu.cwru.sepia.action.Action;
+import edu.cwru.sepia.action.ActionFeedback;
 import edu.cwru.sepia.action.ActionResult;
 import edu.cwru.sepia.agent.Agent;
 import edu.cwru.sepia.agent.planner.actions.*;
@@ -115,21 +116,27 @@ public class PEAgent extends Agent {
 //    		tempPlan.push(this.plan.pop());
 //    	}
     
-    	while (!plan.isEmpty()) {
-    		StripsAction nextAction = plan.pop();
-    		executionPlan.put(nextAction.getPeasantId(), createSepiaAction(nextAction));
+    	//while (!plan.isEmpty()) {
     		
-    		System.out.println("INFO: Added " + nextAction.toString() + " to execution plan.");
-    	}
-    	
-    	if (stateView.getTurnNumber() != 0) {
+    		//System.out.println("INFO: Added " + nextAction.toString() + " to execution plan.");
+    		System.out.println("Turn: " + stateView.getTurnNumber());
     		
-    		Map<Integer, ActionResult> actionResults = historyView.getCommandFeedback(playernum, stateView.getTurnNumber() - 1);
-    		
-    		for (ActionResult result : actionResults.values()) {
-    			System.out.println("RESULT: " + result.toString());
+    		if (stateView.getTurnNumber() == 0) {
+    			StripsAction nextAction = plan.pop();
+    			executionPlan.put(nextAction.getPeasantId(), createSepiaAction(nextAction));
     		}
-    	}
+    		else if (!plan.isEmpty()) {    			
+    			Map<Integer, ActionResult> actionResults = historyView.getCommandFeedback(playernum, stateView.getTurnNumber() - 1);
+    			
+    			for (ActionResult result : actionResults.values()) {
+    				
+    				if (result.getFeedback() != ActionFeedback.INCOMPLETE) {
+    					StripsAction nextAction = plan.pop();    	
+    		    		executionPlan.put(nextAction.getPeasantId(), createSepiaAction(nextAction));
+    					System.out.println(result.toString());
+    				}
+    		}
+		}
     	return executionPlan;
     }
 
