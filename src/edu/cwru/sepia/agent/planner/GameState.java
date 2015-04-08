@@ -90,7 +90,7 @@ public class GameState implements Comparable<GameState> {
     	discoverUnits(state);
     	discoverResources(state);
     	
-    	this.food = stateView.getSupplyCap(townhall.getID());
+    	this.food = stateView.getSupplyCap(townhall.getID()) - 1;
     	this.grossGold = 0;
     	this.grossWood = 0;
     }
@@ -348,7 +348,7 @@ public class GameState implements Comparable<GameState> {
     		overallH *= 10;
     	}
     	
-    	// Encourage states that have gathered more resources.
+    	// Encourage states that have gathered more resources overall.
     	// Works with arbitrary resource requirements.
     	overallH += 2.5 * (requiredWood + requiredGold + 400 * (2 - food)) - 2.5 * (grossWood + grossGold);
     	

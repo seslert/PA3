@@ -159,7 +159,7 @@ public class PEAgent extends Agent {
     	
     	if (action instanceof BuildPeasant) {
     		BuildPeasant buildPeasant = (BuildPeasant) action;
-    		return Action.createPrimitiveProduction(buildPeasant.getTownhallId(), buildPeasant.getPeasantId());
+    		return Action.createCompoundProduction(buildPeasant.getTownhallId(), buildPeasant.getPeasantTemplateId());
     	}
         
     	return null;

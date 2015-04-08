@@ -13,8 +13,9 @@ public class BuildPeasant implements StripsAction {
 	
 	private int townhallId;
 	private int peasantId;
+	private int peasantTemplateId;
 	
-	public BuildPeasant(int townhallId) {
+	public BuildPeasant(int townhallId, int playernum) {
 		
 		this.townhallId = townhallId;
 	}
@@ -30,6 +31,11 @@ public class BuildPeasant implements StripsAction {
 		return this.peasantId;
 	}
 	
+	public int getPeasantTempalteId() {
+		
+		return this.peasantTemplateId;
+	}
+	
 	public int getTownhallId() {
 		
 		return this.townhallId;
@@ -43,8 +49,12 @@ public class BuildPeasant implements StripsAction {
 	@Override
 	public GameState apply(GameState state) {
 		
+		TemplateView peasantTemplate = state.stateView.getTemplate(state.getPlayernum(), "Peasant");
+		peasantTemplateId = peasantTemplate.getID();
+		
 		Peasant peasant = new Peasant(state.getLargestPeasantId() + 1, new Position(state.townhall.getXPosition(), state.townhall.getYPosition()));
 		//Peasant peasant = new Peasant(peasantTemplateID, new Position(state.townhall.getXPosition() + 2, state.townhall.getYPosition() + 2));
+		
 		this.peasantId = peasant.getID();
 		state.peasants.put(peasant.getID(), peasant);
 		state.removeGold(400);
