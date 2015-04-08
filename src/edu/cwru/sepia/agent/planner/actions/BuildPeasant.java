@@ -31,7 +31,7 @@ public class BuildPeasant implements StripsAction {
 		return this.peasantId;
 	}
 	
-	public int getPeasantTempalteId() {
+	public int getPeasantTemplateId() {
 		
 		return this.peasantTemplateId;
 	}
