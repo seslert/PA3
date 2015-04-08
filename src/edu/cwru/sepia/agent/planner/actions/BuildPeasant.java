@@ -15,7 +15,7 @@ public class BuildPeasant implements StripsAction {
 	private int peasantId;
 	private int peasantTemplateId;
 	
-	public BuildPeasant(int townhallId, int playernum) {
+	public BuildPeasant(int townhallId) {
 		
 		this.townhallId = townhallId;
 	}
@@ -28,7 +28,7 @@ public class BuildPeasant implements StripsAction {
 	@Override
 	public int getPeasantId() {
 		
-		return this.peasantId;
+		return getTownhallId();
 	}
 	
 	public int getPeasantTemplateId() {

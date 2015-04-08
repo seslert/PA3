@@ -115,7 +115,7 @@ public class GameState implements Comparable<GameState> {
     	this.xExtent = this.stateView.getXExtent();
     	this.yExtent = this.stateView.getYExtent();
     	this.units = parent.units;
-    	//this.resources = new ArrayList<ResourceNode>(parent.resources);
+    	this.resources = new ArrayList<ResourceNode>(parent.resources);
     	this.peasants = new HashMap<Integer, Peasant>();
     	this.gCost = Double.MAX_VALUE;
     	this.cost = 0.0;
@@ -125,8 +125,8 @@ public class GameState implements Comparable<GameState> {
     		this.peasants.put(peasant.getID(), peasant.Clone(peasant));
     	}
     	
-    	this.resources = new ArrayList<ResourceNode>();
-    	discoverResources(stateView);
+    	//this.resources = new ArrayList<ResourceNode>();
+    	//discoverResources(stateView);
     	
     	this.townhall = parent.townhall;	
     	
@@ -353,7 +353,7 @@ public class GameState implements Comparable<GameState> {
     	overallH += 2.5 * (requiredWood + requiredGold + 400 * (2 - food)) - 2.5 * (grossWood + grossGold);
     	
     	// Encourage states that have multiple peasants (assuming that the maximum number of peasants is 3)
-    	overallH = overallH / Math.pow(2, peasants.size());
+    	//overallH = overallH / Math.pow(2, peasants.size());
 
         return overallH / peasants.size();
     }
