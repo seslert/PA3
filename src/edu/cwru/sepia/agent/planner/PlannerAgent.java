@@ -99,7 +99,7 @@ public class PlannerAgent extends Agent {
     	
     	while (!openSet.isEmpty()) {    		
     		current = GetLowestFcost(openSet);
-    		if (current.getGold() == 400 && reset == false) {
+    		if (current.actionHistory instanceof BuildPeasant && reset == false) {
     			slow = true;
     			reset = true;
     		}
@@ -108,7 +108,7 @@ public class PlannerAgent extends Agent {
     		}
     		if (slow) {
     			try {
-					Thread.sleep(5000);
+					Thread.sleep(500);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

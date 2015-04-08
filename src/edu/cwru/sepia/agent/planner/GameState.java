@@ -49,7 +49,10 @@ public class GameState implements Comparable<GameState> {
 	private int playernum;
 	private int requiredGold;
 	private int currentGold;
+	private int grossGold;
 	private int requiredWood;
+	private int grossWood;
+	private int food;
 	private int currentWood;
 	private int xExtent;
 	private int yExtent;
@@ -101,6 +104,10 @@ public class GameState implements Comparable<GameState> {
     	for (ResourceView r : stateView.getAllResourceNodes()) {    		
     		this.resources.add(new ResourceNode(r.getType(), r.getXPosition(), r.getYPosition(), r.getAmountRemaining(), r.getID()));
     	}
+    	
+    	this.food = stateView.getSupplyCap(townhall.getID());
+    	this.grossGold = 0;
+    	this.grossWood = 0;
     }
     
     /**
@@ -133,6 +140,10 @@ public class GameState implements Comparable<GameState> {
     		this.peasants.put(peasant.getID(), peasant.Clone(peasant));
     	}
     	this.townhall = parent.townhall;	
+    	
+    	this.food = parent.food;
+    	this.grossGold = parent.grossGold;
+    	this.grossWood = parent.grossWood;
     }
     
     /**
@@ -165,10 +176,8 @@ public class GameState implements Comparable<GameState> {
         
     	List<GameState> children = new ArrayList<GameState>();
     	
-    	System.out.println("stateView.getSupplyCap(townhall.getID()): " + stateView.getSupplyCap(townhall.getID()));
-    	
     	// Generate BuildPeasant state if preconditions met
-    	if (buildPeasants && currentGold >= 400 && stateView.getSupplyCap(townhall.getID()) > 0) {
+    	if (buildPeasants && currentGold >= 400 && food > 0) {
     		BuildPeasant buildPeasant = new BuildPeasant(townhall.getID());
     		GameState st = new GameState(this, buildPeasant);
 			children.add(buildPeasant.apply(st));
@@ -263,6 +272,7 @@ public class GameState implements Comparable<GameState> {
     
     public void addGold(int amount) {
     	currentGold += amount;
+    	grossGold += amount;
     }
     
     public void removeGold(int amount) {
@@ -271,6 +281,7 @@ public class GameState implements Comparable<GameState> {
     
     public void addWood(int amount) {
     	currentWood += amount;
+    	grossWood += amount;
     }
     
     public int getGold() {
@@ -317,15 +328,15 @@ public class GameState implements Comparable<GameState> {
     	
     	// Encourage states that build peasants
     	if (!(this.actionHistory instanceof BuildPeasant)) {
-    		overallH *= 2;
+    		overallH *= 10;
     	}
     	
     	// Encourage states that have gathered more resources.
     	// Works with arbitrary resource requirements.
-    	overallH += 2.5 * (requiredWood + requiredGold) - 2.5 * (currentWood + currentGold);
+    	overallH += 2.5 * (requiredWood + requiredGold + 400 * (2 - food)) - 2.5 * (grossWood + grossGold);
     	
     	// Encourage states that have multiple peasants (assuming that the maximum number of peasants is 3)
-    	overallH = overallH * (4 - peasants.size());
+    	//overallH = overallH * (4 - peasants.size());
 
         return overallH / peasants.size();
     }
@@ -350,6 +361,22 @@ public class GameState implements Comparable<GameState> {
     
     public void calculateFunctionalCost() {
     	this.fCost = getGCost() + heuristic();
+    }
+    
+    public void reduceFood(int reduce) {
+    	this.food -= reduce;
+    }
+    
+    public int getLargestPeasantId() {
+    	
+    	int largest = 0;
+    	for (Peasant peasant : peasants.values()) {
+    		if (peasant.getID() > largest) {
+    			largest = peasant.getID();
+    		}
+    	}
+    	
+    	return largest;
     }
 
     /**
@@ -465,15 +492,12 @@ public class GameState implements Comparable<GameState> {
         for (Peasant p : peasants.values()) {
         	hashCode += p.getXPosition();
         	hashCode += p.getYPosition();
-        	
-//        	// TODO: Remove
-//        	System.out.println("\nHashCode peasant position: " + p.getPosition().toString());
         }
         
         for (ResourceNode resource : resources) {
         	hashCode += resource.getAmountRemaining();
         }
-        hashCode /= ((int)getFunctionalCost() + 1);
+        hashCode += ((int)getFunctionalCost() + 1);
     	
         return hashCode;
     }

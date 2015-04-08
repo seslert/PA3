@@ -38,14 +38,12 @@ public class BuildPeasant implements StripsAction {
 	@Override
 	public GameState apply(GameState state) {
 		
-		TemplateView peasantTemplate = state.stateView.getTemplate(state.getPlayernum(), "Peasant");
-        int peasantTemplateID = peasantTemplate.getID();     // is this the actual peasants id or just the templates id?
-		
-		Peasant peasant = new Peasant(peasantTemplateID, new Position(state.townhall.getXPosition(), state.townhall.getYPosition()));
+		Peasant peasant = new Peasant(state.getLargestPeasantId() + 1, new Position(state.townhall.getXPosition(), state.townhall.getYPosition()));
 		//Peasant peasant = new Peasant(peasantTemplateID, new Position(state.townhall.getXPosition() + 2, state.townhall.getYPosition() + 2));
-		this.peasantId = peasantTemplateID;
-		state.peasants.put(peasantTemplateID, peasant);
+		this.peasantId = peasant.getID();
+		state.peasants.put(peasant.getID(), peasant);
 		state.removeGold(400);
+		state.reduceFood(1);
 		
 		return state;
 	}
