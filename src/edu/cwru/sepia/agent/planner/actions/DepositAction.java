@@ -40,6 +40,14 @@ public class DepositAction implements StripsAction {
 	
 	/**
 	 * 
+	 */
+	@Override
+	public void setPeasantId(int id) {
+		this.peasantId = id;
+	}
+	
+	/**
+	 * 
 	 * @return
 	 */
 	@Override

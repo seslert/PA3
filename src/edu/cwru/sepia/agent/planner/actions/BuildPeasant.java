@@ -20,6 +20,13 @@ public class BuildPeasant implements StripsAction {
 		this.townhallId = townhallId;
 	}
 	
+	/**
+	 * 
+	 */
+	@Override
+	public void setPeasantId(int id) {
+		this.peasantId = id;
+	}
 	
 	/**
 	 * 
@@ -52,7 +59,7 @@ public class BuildPeasant implements StripsAction {
 		TemplateView peasantTemplate = state.stateView.getTemplate(state.getPlayernum(), "Peasant");
 		peasantTemplateId = peasantTemplate.getID();
 		
-		Peasant peasant = new Peasant(state.getLargestPeasantId() + 1, new Position(state.townhall.getXPosition(), state.townhall.getYPosition()));
+		Peasant peasant = new Peasant(state.getLargestPeasantId() + 1, new Position(state.townhall.getXPosition() - 1, state.townhall.getYPosition()));
 		//Peasant peasant = new Peasant(peasantTemplateID, new Position(state.townhall.getXPosition() + 2, state.townhall.getYPosition() + 2));
 		
 		this.peasantId = peasant.getID();

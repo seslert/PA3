@@ -44,6 +44,14 @@ public class HarvestAction implements StripsAction {
 	
 	/**
 	 * 
+	 */
+	@Override
+	public void setPeasantId(int id) {
+		this.peasantId = id;
+	}
+	
+	/**
+	 * 
 	 * @return
 	 */
 	@Override
@@ -114,6 +122,9 @@ public class HarvestAction implements StripsAction {
 			break;
 		}
 		state.peasants.get(peasantId).addCargo(resourceNode.reduceAmountRemaining(100));
+		if (resourceNode.getAmountRemaining() <= 0) {
+			state.resources.remove(resourceNode);
+		}
 		state.cost = 2;
 		state.gCost += state.cost;
 		

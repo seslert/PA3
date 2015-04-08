@@ -71,7 +71,7 @@ public class GameState implements Comparable<GameState> {
      * @param buildPeasants True if the BuildPeasant action should be considered
      */
     public GameState(State.StateView state, int playernum, int requiredGold, int requiredWood, boolean buildPeasants) {
-        
+
     	this.playernum = playernum;
     	this.stateView = state; 
     	this.requiredGold = requiredGold;
@@ -125,6 +125,10 @@ public class GameState implements Comparable<GameState> {
     		this.peasants.put(peasant.getID(), peasant.Clone(peasant));
     	}
     	
+//    	for (ResourceNode resource : parent.resources) {
+//    		this.resources.add(resource.copyOf());
+//    	}
+    	
     	//this.resources = new ArrayList<ResourceNode>();
     	//discoverResources(stateView);
     	
@@ -133,6 +137,12 @@ public class GameState implements Comparable<GameState> {
     	this.food = parent.food;
     	this.grossGold = parent.grossGold;
     	this.grossWood = parent.grossWood;
+    }
+    
+    private ResourceNode cloneResource(ResourceNode resource) {
+    	ResourceNode newResource = new ResourceNode(resource.getType(), resource.getxPosition(), resource.getyPosition(), resource.getAmountRemaining(), resource.getID());
+    	
+    	return newResource;
     }
     
     private void discoverUnits(State.StateView s) {
@@ -353,7 +363,7 @@ public class GameState implements Comparable<GameState> {
     	overallH += 2.5 * (requiredWood + requiredGold + 400 * (2 - food)) - 2.5 * (grossWood + grossGold);
     	
     	// Encourage states that have multiple peasants (assuming that the maximum number of peasants is 3)
-    	//overallH = overallH / Math.pow(2, peasants.size());
+    	overallH *= Math.pow(2, 3 - peasants.size()) ;
 
         return overallH / peasants.size();
     }
@@ -539,6 +549,7 @@ public class GameState implements Comparable<GameState> {
     	builder.append("Current Gold: " + getCurrentGold() + " | Current Wood: " + getCurrentWood() + "\n");
     	builder.append("Gross Gold: " + grossGold + " | Gross Wood: " + grossWood + "\n");
     	builder.append("Active Peasants: " + peasants.size() + " | Remaining Resources: " + resources.size() + "\n");
+    	builder.append("personshit: " + playernum);
     	
     	if (actionHistory != null) {
     		builder.append("Action History: " + actionHistory.toString() + "\n");

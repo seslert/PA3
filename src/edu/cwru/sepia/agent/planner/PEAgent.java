@@ -10,6 +10,7 @@ import edu.cwru.sepia.environment.model.state.ResourceType;
 import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Template;
 import edu.cwru.sepia.environment.model.state.Unit;
+import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 import edu.cwru.sepia.util.Direction;
 
 import java.io.InputStream;
@@ -124,6 +125,17 @@ public class PEAgent extends Agent {
 					
 					System.out.println("Next Action to Execute: " + nextAction.toString());
 					
+					for (UnitView unit : stateView.getUnits(0)) {
+						System.out.println(unit.getTemplateView().getName() + ": " + unit.getID());
+					}
+					
+					if (nextAction.getPeasantId() == 2) {
+		    			nextAction.setPeasantId(10);
+		    		}
+					if (nextAction.getPeasantId() == 3) {
+						nextAction.setPeasantId(11);
+					}
+		    		System.out.println("plan size: " + plan.size());
 		    		executionPlan.put(nextAction.getPeasantId(), createSepiaAction(nextAction));
 				}
     		}

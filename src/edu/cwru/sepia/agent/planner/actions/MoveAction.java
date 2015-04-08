@@ -31,6 +31,14 @@ public class MoveAction implements StripsAction {
 		this(peasantId, new Position(x, y));
 	}
 	
+	/**
+	 * 
+	 */
+	@Override
+	public void setPeasantId(int id) {
+		this.peasantId = id;
+	}
+	
 	@Override
 	public int getPeasantId() {
 		
