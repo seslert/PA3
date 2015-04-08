@@ -95,19 +95,26 @@ public class PlannerAgent extends Agent {
     	GameState current = startState;
     	openSet.add(current);
     	boolean slow = false;
+    	boolean reset = false;
     	
     	while (!openSet.isEmpty()) {    		
     		current = GetLowestFcost(openSet);
-    		if (current.actionHistory instanceof BuildPeasant) {
+    		if (current.getGold() == 400 && reset == false) {
     			slow = true;
+    			reset = true;
+    		}
+    		else if (current.getGold() != 400){
+    			reset = false;
     		}
     		if (slow) {
     			try {
-					Thread.sleep(1000);
+					Thread.sleep(5000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+    			slow = false;
+    			reset = true;
     		}
     		openSet.remove(current);
     		

@@ -165,6 +165,8 @@ public class GameState implements Comparable<GameState> {
         
     	List<GameState> children = new ArrayList<GameState>();
     	
+    	System.out.println("stateView.getSupplyCap(townhall.getID()): " + stateView.getSupplyCap(townhall.getID()));
+    	
     	// Generate BuildPeasant state if preconditions met
     	if (buildPeasants && currentGold >= 400 && stateView.getSupplyCap(townhall.getID()) > 0) {
     		BuildPeasant buildPeasant = new BuildPeasant(townhall.getID());
@@ -321,6 +323,9 @@ public class GameState implements Comparable<GameState> {
     	// Encourage states that have gathered more resources.
     	// Works with arbitrary resource requirements.
     	overallH += 2.5 * (requiredWood + requiredGold) - 2.5 * (currentWood + currentGold);
+    	
+    	// Encourage states that have multiple peasants (assuming that the maximum number of peasants is 3)
+    	overallH = overallH * (4 - peasants.size());
 
         return overallH / peasants.size();
     }
@@ -491,6 +496,7 @@ public class GameState implements Comparable<GameState> {
     	builder.append("GCost: " + gCost + "\n");
     	builder.append("FCost: " + getFunctionalCost() + "\n");
     	builder.append("Current Gold: " + getCurrentGold() + ", current Wood: " + getCurrentWood() + "\n");
+    	builder.append("Number peasants: " + peasants.size() + ", number resources: " + resources.size() + "\n");
     	
     	if (actionHistory != null) {
     		builder.append("Action History: " + actionHistory.toString() + "\n");
