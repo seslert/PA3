@@ -12,7 +12,7 @@ public class MoveAction implements StripsAction {
 	private Position origin;
 	
 	/**
-	 * 
+	 * Creates a MoveAction associated with the given unit
 	 * @param destination
 	 */
 	public MoveAction(int peasantId, Position destination) {
@@ -22,7 +22,7 @@ public class MoveAction implements StripsAction {
 	}
 	
 	/**
-	 * 
+	 * Creates a MoveAction associated with the given unit
 	 * @param x
 	 * @param y
 	 */
@@ -32,35 +32,52 @@ public class MoveAction implements StripsAction {
 	}
 	
 	/**
-	 * 
+	 * Sets the ID of the peasant 
 	 */
 	@Override
-	public void setPeasantId(int id) {
+	public void setUnitId(int id) {
 		this.peasantId = id;
 	}
 	
+	/**
+	 * Gets the unit ID associated with this action
+	 */
 	@Override
-	public int getPeasantId() {
+	public int getUnitId() {
 		
 		return this.peasantId;
 	}
 	
+	/**
+	 * Returns the destination of this move action
+	 * @return
+	 */
 	public Position getDestination() {
 		
 		return this.destination;
 	}
 	
+	/**
+	 * Returns the origin of the peasant associated with this move action
+	 * @return
+	 */
 	public Position getOrigin() {
 		
 		return this.origin;
 	}
 	
+	/**
+	 * We check for this in the game state before we create the child so this method is unused. Sorry about that.
+	 */
 	@Override
 	public boolean preconditionsMet(GameState state) {
 		
 		return false;
 	}
 	
+	/**
+	 * Applies the effects of this action to the state
+	 */
 	@Override
 	public GameState apply(GameState state) {
 		this.origin = state.peasants.get(peasantId).getPosition();
@@ -74,6 +91,9 @@ public class MoveAction implements StripsAction {
 		return state;
 	}
 	
+	/**
+	 * Returns a readable format of this action for the plan.txt file
+	 */
 	@Override
 	public String toString() {
 		

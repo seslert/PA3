@@ -47,6 +47,8 @@ public class PEAgent extends Agent {
         super(playernum);
         peasantIdMap = new HashMap<Integer, Integer>();
         this.plan = plan;
+        
+        System.out.println("Plan ready for execution!");
     }
 
     @Override
@@ -108,36 +110,34 @@ public class PEAgent extends Agent {
      */
     @Override
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
-        System.out.println("testing1");
-    	Map<Integer, Action> executionPlan = new LinkedHashMap<Integer, Action>();
+        Map<Integer, Action> executionPlan = new LinkedHashMap<Integer, Action>();
 		
+        // If it is the first turn we need to put the first action on the stack.
 		if (stateView.getTurnNumber() == 0) {
 			StripsAction nextAction = plan.pop();
-			executionPlan.put(nextAction.getPeasantId(), createSepiaAction(nextAction));
+			executionPlan.put(nextAction.getUnitId(), createSepiaAction(nextAction));
 		}
+		// If it is not the first turn and we still have moves left, look at the actions of the past state.
 		else if (!plan.isEmpty()) {    			
-			System.out.println("testing");
 			Map<Integer, ActionResult> actionResults = historyView.getCommandFeedback(playernum, stateView.getTurnNumber() - 1);
 			
 			for (ActionResult result : actionResults.values()) {
-				
+				// The last action has completed so we can add the next action.
 				if (result.getFeedback() != ActionFeedback.INCOMPLETE) {
 					StripsAction nextAction = plan.pop();   
 					
-					System.out.println("Next Action to Execute: " + nextAction.toString());
-					
-					for (UnitView unit : stateView.getUnits(0)) {
-						System.out.println(unit.getTemplateView().getName() + ": " + unit.getID());
-					}
-					
-					if (nextAction.getPeasantId() == 2) {
-		    			nextAction.setPeasantId(10);
+					// =======================================
+					// We could not figure out how to map the ID of a newly created peasant so that
+					// a new action could be associated with that peasant.  It is manually performed here
+					// and seems to work well.  We found the IDs associated by looking at the current stateview.
+					if (nextAction.getUnitId() == 2) {
+		    			nextAction.setUnitId(10);
 		    		}
-					if (nextAction.getPeasantId() == 3) {
-						nextAction.setPeasantId(11);
+					if (nextAction.getUnitId() == 3) {
+						nextAction.setUnitId(11);
 					}
-		    		System.out.println("plan size: " + plan.size());
-		    		executionPlan.put(nextAction.getPeasantId(), createSepiaAction(nextAction));
+					// =======================================
+					executionPlan.put(nextAction.getUnitId(), createSepiaAction(nextAction));					
 				}
     		}
 		}
@@ -151,29 +151,29 @@ public class PEAgent extends Agent {
      */
     private Action createSepiaAction(StripsAction action) {
     	
+    	// Deal with a MoveAction
     	if (action instanceof MoveAction) {
     		MoveAction moveAction = (MoveAction) action;
     		Position destination = moveAction.getDestination();
     		
-    		return Action.createCompoundMove(moveAction.getPeasantId(), destination.x, destination.y);
+    		return Action.createCompoundMove(moveAction.getUnitId(), destination.x, destination.y);
     	}
-    	
+    	// Deals with a HarvestAction
     	if (action instanceof HarvestAction) {
     		HarvestAction harvestAction = (HarvestAction) action;    		
     		
-    		return Action.createPrimitiveGather(harvestAction.getPeasantId(), harvestAction.getResourceDirection());
+    		return Action.createPrimitiveGather(harvestAction.getUnitId(), harvestAction.getResourceDirection());
     	}
-    	
+    	// Deals with DepositAction
     	if (action instanceof DepositAction) {
     		DepositAction depositAction = (DepositAction) action;
     		
-    		return Action.createPrimitiveDeposit(depositAction.getPeasantId(), depositAction.getResourceDirection());
+    		return Action.createPrimitiveDeposit(depositAction.getUnitId(), depositAction.getTownhallDirection());
     	}
-    	
+    	// Deals with building a peasant
     	if (action instanceof BuildPeasant) {
     		BuildPeasant buildPeasant = (BuildPeasant) action;
-    		System.out.println("buildPeasant.getPeasantTemplateId(): " + buildPeasant.getPeasantTemplateId());
-    		return Action.createPrimitiveProduction(buildPeasant.getTownhallId(), buildPeasant.getPeasantTemplateId());
+    		return Action.createPrimitiveProduction(buildPeasant.getUnitId(), buildPeasant.getPeasantTemplateId());
     	}
         
     	return null;

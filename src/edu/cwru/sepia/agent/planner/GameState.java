@@ -34,8 +34,6 @@ import java.util.Map;
  */
 public class GameState implements Comparable<GameState> {
 	
-	public int depth;
-	
 	public State.StateView stateView;
 	public StripsAction actionHistory;
 	public GameState parent;
@@ -96,12 +94,11 @@ public class GameState implements Comparable<GameState> {
     }
     
     /**
-     * 
+     * Constructs a game state from a parent game state and the action that resulted in this state
      * @param parent
+     * @param actionHistory
      */
     public GameState(GameState parent, StripsAction actionHistory) {
-    	
-    	this.depth = parent.depth + 1;
     	
     	this.playernum = parent.playernum;
     	this.actionHistory = actionHistory;
@@ -121,60 +118,23 @@ public class GameState implements Comparable<GameState> {
     	this.cost = 0.0;
     	this.fCost = Double.MAX_VALUE;
     	
+    	// creates new peasants for the child so these peasants can be modified without affecting parent state
     	for (Peasant peasant : parent.peasants.values()) {
-    		this.peasants.put(peasant.getID(), peasant.Clone(peasant));
+    		this.peasants.put(peasant.getID(), peasant.clone(peasant));
     	}
     	
+    	// creates new resources for the child so these resources can be modified without affecting parent state
     	for (ResourceNode resource : parent.resources) {
     		this.resources.add(cloneResource(resource));
     	}
     	
     	this.townhall = parent.townhall;	
-    	
     	this.food = parent.food;
     	this.grossGold = parent.grossGold;
     	this.grossWood = parent.grossWood;
     }
     
-    public ResourceNode cloneResource(ResourceNode resource) {
-    	return new ResourceNode(resource.getType(), resource.getxPosition(), resource.getyPosition(), resource.getAmountRemaining(), resource.ID);
-    }
     
-    private void discoverUnits(State.StateView s) {
-    	
-    	for (UnitView unit : s.getAllUnits()) {
-    		String unitType = unit.getTemplateView().getName().toLowerCase();
-    		
-    		if (unitType.equals("peasant")) {
-    			Peasant peasant = new Peasant(unit);
-    			peasant.setPosition(new Position(unit.getXPosition(), unit.getYPosition()));
-    			this.peasants.put(unit.getID(), peasant);
-    		}
-    		else if (townhall == null && unitType.equals("townhall"))
-    		{
-    			this.townhall = unit;
-    		}
-    	}
-    }
-    
-    /**
-     * Determines all remaining resources in the state.
-     * @param s
-     */
-    private void discoverResources(State.StateView s) {
-    	
-    	for (ResourceView r : s.getAllResourceNodes()) {    		
-    		this.resources.add(new ResourceNode(r.getType(), r.getXPosition(), r.getYPosition(), r.getAmountRemaining(), r.getID()));
-    	}
-    }
-    
-    /**
-     * Sets the parent pointer for this GameState.
-     * @param parent
-     */
-    public void setAstarParent(GameState parent) {
-    	this.astarParent = parent;
-    }
 
     /**
      * Unlike in the first A* assignment there are many possible goal states. As long as the wood and gold requirements
@@ -257,68 +217,16 @@ public class GameState implements Comparable<GameState> {
     }
     
     /**
-     * Determines if this state still needs a given resource.
-     * @param resourceNode
-     * @return
-     */
-    public boolean needResource(ResourceNode resourceNode) {
-    	
-    	switch (resourceNode.getResourceType()) {
-    	case GOLD:
-    		return currentGold < requiredGold;    		
-    	case WOOD:
-    		return currentWood < requiredWood;
-    	}
-    	return true;
-    }
-    
-    /**
-     * Get a Position abstraction of a unit's x and y coordinates.
-     * @param unit
-     * @return
-     */
-    public Position getUnitPosition(UnitView unit) {
-    	    	
-    	return new Position(unit.getXPosition(), unit.getYPosition());
-    }
-    
-    /**
-     * Get a Position abstraction of a resource's x and y coordinates.
-     * @param resource
-     * @return
-     */
-    public Position getResourcePosition(ResourceNode resource) {
-    	
-    	return new Position(resource.getxPosition(), resource.getyPosition());
-    }
-    
-    public void addGold(int amount) {
-    	currentGold += amount;
-    	grossGold += amount;
-    }
-    
-    public void removeGold(int amount) {
-    	currentGold -= amount;
-    }
-    
-    public void addWood(int amount) {
-    	currentWood += amount;
-    	grossWood += amount;
-    }
-    
-    public int getGold() {
-    	return this.currentGold;
-    }
-    
-    public int getPlayernum() {
-    	return this.playernum;
-    }
-
-    /**
      * Write your heuristic function here. Remember this must be admissible for the properties of A* to hold. If you
      * can come up with an easy way of computing a consistent heuristic that is even better, but not strictly necessary.
      *
-     * Add a description here in your submission explaining your heuristic.
+     * This heuristic seeks to maximize state actions in the following order:
+     * 		1. Peasants adjacent to the townhall should deposit to free them up to get more resources
+     * 		2. Peasants with cargo should move to the townhall for depositing
+     * 		3. Peasants next to resources should harvest them
+     * 		4. Peasants with no cargo should get next to a resource
+     * 
+     * Encouraged over these movements are states that have progressed the farthest (build peasants, have more peasants, have more resources)
      *
      * @return The value estimated remaining cost to reach a goal state from this state.
      */
@@ -362,11 +270,60 @@ public class GameState implements Comparable<GameState> {
 
         return overallH / peasants.size();
     }
+    
+    /**
+     * Creates a clone of the resource
+     * @param resource
+     * @return
+     */
+    public ResourceNode cloneResource(ResourceNode resource) {
+    	return new ResourceNode(resource.getType(), resource.getxPosition(), resource.getyPosition(), resource.getAmountRemaining(), resource.ID);
+    }
+    
+    /**
+     * finds all the units in the stateView and separates them according to type, used in initial setup
+     * @param s
+     */
+    private void discoverUnits(State.StateView s) {
+    	
+    	for (UnitView unit : s.getAllUnits()) {
+    		String unitType = unit.getTemplateView().getName().toLowerCase();
+    		
+    		if (unitType.equals("peasant")) {
+    			Peasant peasant = new Peasant(unit);
+    			peasant.setPosition(new Position(unit.getXPosition(), unit.getYPosition()));
+    			this.peasants.put(unit.getID(), peasant);
+    		}
+    		else if (townhall == null && unitType.equals("townhall"))
+    		{
+    			this.townhall = unit;
+    		}
+    	}
+    }
+    
+    /**
+     * Determines all remaining resources in the state.
+     * @param s
+     */
+    private void discoverResources(State.StateView s) {
+    	
+    	for (ResourceView r : s.getAllResourceNodes()) {    		
+    		this.resources.add(new ResourceNode(r.getType(), r.getXPosition(), r.getYPosition(), r.getAmountRemaining(), r.getID()));
+    	}
+    }
+    
+    /**
+     * Sets the parent pointer for this GameState.
+     * @param parent
+     */
+    public void setAstarParent(GameState parent) {
+    	
+    	this.astarParent = parent;
+    }
 
     /**
      *
-     * Write the function that computes the current cost to get to this node. This is combined with your heuristic to
-     * determine which actions/states are better to explore.
+     * Returns the cost to arrive at this state from the root.
      *
      * @return The current cost to reach this goal
      */
@@ -375,20 +332,35 @@ public class GameState implements Comparable<GameState> {
     	return this.gCost;
     }
      
+    /**
+     * Returns the functional cost of the state
+     * @return
+     */
     public double getFunctionalCost() {
     	calculateFunctionalCost();
     	
     	return this.fCost;
     }
     
+    /**
+     * calculates the functional cost based on Gcost and the heuristic.
+     */
     public void calculateFunctionalCost() {
     	this.fCost = getGCost() + heuristic();
     }
     
+    /**
+     * Use up food when a peasant is created.
+     * @param reduce
+     */
     public void reduceFood(int reduce) {
     	this.food -= reduce;
     }
     
+    /**
+     * Used when creating a new peasant to ensure its ID is unique.
+     * @return
+     */
     public int getLargestPeasantId() {
     	
     	int largest = 0;
@@ -425,7 +397,7 @@ public class GameState implements Comparable<GameState> {
     }
 
     /**
-     * This will be necessary to use the GameState as a key in a Set or Map.
+     * Looks at all aspects of a game state to determine equality with other state.
      *
      * @param o The game state to compare
      * @return True if this state equals the other state, false otherwise.
@@ -452,8 +424,7 @@ public class GameState implements Comparable<GameState> {
     			// The peasant has an exact match.
     			if (p1.equals(p2) && peasant1.getCargoAmount() == peasant2.getCargoAmount()) {
     				
-    				if (peasant1.getCargoType() != null && peasant2.getCargoType() != null)
-    				{
+    				if (peasant1.getCargoType() != null && peasant2.getCargoType() != null) {
     					if (peasant1.getCargoType().equals(peasant2.getCargoType())) {    				
         					numMatches++;
         				}
@@ -524,20 +495,127 @@ public class GameState implements Comparable<GameState> {
         return hashCode;
     }
     
+    /**
+     * Returns current gold.
+     * @return
+     */
     public int getCurrentGold() {
     	
     	return this.currentGold;
     }
     
+    /**
+     * Returns current wood.
+     * @return
+     */
     public int getCurrentWood() {
     	
     	return this.currentWood;
     }
     
+    /**
+     * Returns the required gold
+     * @return
+     */
+    public int getRequiredGold() {
+    	
+    	return this.requiredGold;
+    }
+    
+    /**
+     * Returns the required wood
+     * @return
+     */
+    public int getRequiredWood() {
+    	
+    	return this.requiredWood;
+    }
+    
+    /**
+     * Determines if this state still needs a given resource.
+     * @param resourceNode
+     * @return
+     */
+    public boolean needResource(ResourceNode resourceNode) {
+    	
+    	switch (resourceNode.getResourceType()) {
+    	case GOLD:
+    		return currentGold < requiredGold;    		
+    	case WOOD:
+    		return currentWood < requiredWood;
+    	}
+    	return true;
+    }
+    
+    /**
+     * Get a Position abstraction of a unit's x and y coordinates.
+     * @param unit
+     * @return
+     */
+    public Position getUnitPosition(UnitView unit) {
+    	    	
+    	return new Position(unit.getXPosition(), unit.getYPosition());
+    }
+    
+    /**
+     * Get a Position abstraction of a resource's x and y coordinates.
+     * @param resource
+     * @return
+     */
+    public Position getResourcePosition(ResourceNode resource) {
+    	
+    	return new Position(resource.getxPosition(), resource.getyPosition());
+    }
+    
+    /**
+     * Increment the amount of gold deposited in the townhall.
+     * @param amount
+     */
+    public void addGold(int amount) {
+    	currentGold += amount;
+    	grossGold += amount;
+    }
+    
+    /**
+     * Decrement the amount of gold deposited in the townhall.
+     * @param amount
+     */
+    public void removeGold(int amount) {
+    	currentGold -= amount;
+    }
+    
+    /**
+     * Increment the amount of wood deposited in the townhall.
+     * @param amount
+     */
+    public void addWood(int amount) {
+    	currentWood += amount;
+    	grossWood += amount;
+    }
+    
+    /**
+     * Returns the amount of gold deposited in the townhall.
+     * @return
+     */
+    public int getGold() {
+    	return this.currentGold;
+    }
+    
+    /**
+     * Returns the number of the player currently playing the game.    
+     * @return
+     */
+    public int getPlayernum() {
+    	return this.playernum;
+    }
+    
+    /**
+     * Returns a human readable string containing the pertinent information about the state. You're welcome.
+     */
     @Override
     public String toString() {
     	StringBuilder builder = new StringBuilder();
-    	builder.append("GameState " + hashCode() + ", depth " + depth + "\n");
+    	builder.append("GameState " + hashCode() + "\n");
     	builder.append("Cost to this state: " + cost + "\n");
     	builder.append("GCost: " + gCost + "\n");
     	builder.append("FCost: " + getFunctionalCost() + "\n");

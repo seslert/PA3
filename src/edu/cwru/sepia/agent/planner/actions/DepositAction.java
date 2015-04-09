@@ -9,17 +9,28 @@ import edu.cwru.sepia.util.Direction;
 
 public class DepositAction implements StripsAction {
 	
-	private Direction resourceDirection;
+	private Direction townhallDirection;
 	private ResourceType resourceType;
 	private int peasantId;
 	
-	public DepositAction(int peasantId, Direction resourceDirection, String resourceType) {
+	/**
+	 * Creates a new deposit action associated with a peasant and resource type
+	 * @param peasantId
+	 * @param townhallDirection
+	 * @param resourceType
+	 */
+	public DepositAction(int peasantId, Direction townhallDirection, String resourceType) {
 		
 		this.peasantId = peasantId;
-		this.resourceDirection = resourceDirection;
+		this.townhallDirection = townhallDirection;
 		this.resourceType = getEnum(resourceType);
 	}
 	
+	/**
+	 * Determines the resource type from the string passed to the constructor
+	 * @param value
+	 * @return
+	 */
 	public ResourceType getEnum(String value) {
 		
 		if (value.toLowerCase().equals("wood")) {
@@ -30,32 +41,35 @@ public class DepositAction implements StripsAction {
 	}
 	
 	/**
-	 * 
+	 * Returns the direction to the townhall
 	 * @return
 	 */
-	public Direction getResourceDirection() {
+	public Direction getTownhallDirection() {
 		
-		return this.resourceDirection;			
+		return this.townhallDirection;			
 	}
 	
 	/**
-	 * 
+	 * Sets the unit ID to be associated with this action
 	 */
 	@Override
-	public void setPeasantId(int id) {
+	public void setUnitId(int id) {
 		this.peasantId = id;
 	}
 	
 	/**
-	 * 
+	 * Returns the unit ID associated with this action
 	 * @return
 	 */
 	@Override
-	public int getPeasantId() {
+	public int getUnitId() {
 		
 		return this.peasantId;
 	}
 	
+	/**
+	 * Determines if this action can be performed in the given state
+	 */
 	@Override
 	public boolean preconditionsMet(GameState state) {
 		Position peasantPos = state.peasants.get(peasantId).getPosition();
@@ -64,6 +78,9 @@ public class DepositAction implements StripsAction {
 		return peasantPos.isAdjacent(townhallPos);
 	}
 	
+	/**
+	 * Applies the effects of the action to a given state
+	 */
 	@Override
 	public GameState apply(GameState state) {
 		
@@ -84,6 +101,9 @@ public class DepositAction implements StripsAction {
 		return state;
 	}
 	
+	/**
+	 * Returns a string of the action 
+	 */
 	@Override
 	public String toString() {
 		

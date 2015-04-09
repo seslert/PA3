@@ -94,44 +94,22 @@ public class PlannerAgent extends Agent {
     	Set<GameState> closedSet = new HashSet<GameState>();
     	GameState current = startState;
     	openSet.add(current);
-    	boolean slow = false;
-    	boolean reset = false;
-    	
-    	// TODO: Leave this...
+    	double lastPrintedProgress = 0.0;
     	System.out.println("Planning...");
     	
     	while (!openSet.isEmpty()) {    		
-    		current = GetLowestFcost(openSet);
-//    		try {
-//				Thread.sleep(5000);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//    		if (current.actionHistory instanceof BuildPeasant && reset == false) {
-//    			slow = true;
-//    			reset = true;
-//    		}
-//    		else if (current.getGold() != 400){
-//    			reset = false;
-//    		}
-//    		if (slow) {
-//    			try {
-//					Thread.sleep(500);
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//    			slow = false;
-//    			reset = true;
-//    		}
+    		current = getLowestFcost(openSet);
     		openSet.remove(current);
     		
-			// TODO: remove
-        	System.out.println("\n\nCURRENT State: " + current.toString());
+    		double currentProgress = new Double(current.getCurrentGold() + current.getCurrentWood()) / new Double(current.getRequiredGold() + current.getRequiredWood()) * 100;
     		
-    		if (current.isGoal()) {
-    			System.out.println("Path found.");    			
+    		if (currentProgress > lastPrintedProgress && currentProgress % 10 == 0) {
+    			System.out.print(Math.round(currentProgress) + "%...");
+    			lastPrintedProgress = currentProgress;
+    		}
+    		
+			if (current.isGoal()) {
+    			System.out.println("\nSUCCESS: Path found.");    			
     			return reconstructActionPlan(current);
     		}
     		openSet.remove(current);
@@ -168,18 +146,17 @@ public class PlannerAgent extends Agent {
      * @return
      */
     private Stack<StripsAction> reconstructActionPlan(GameState finalState) {
-    	Stack<StripsAction> reverseActionPlan = new Stack<StripsAction>();
     	Stack<StripsAction> actionPlan = new Stack<StripsAction>();
     	
     	GameState current = finalState;    	
     	
     	while (current.astarParent != null) {
     		
-    		reverseActionPlan.push(current.actionHistory);    		
+    		actionPlan.push(current.actionHistory);    		
     		current = current.astarParent;
     	}
 
-    	return reverseActionPlan;
+    	return actionPlan;
     }
 
     /**
@@ -223,7 +200,12 @@ public class PlannerAgent extends Agent {
         System.out.println("Plan saved successfully.");
     }
     
-    private GameState GetLowestFcost(PriorityQueue<GameState> gameStates) {
+    /**
+     * Gets the lowest Fcost state in the openSet
+     * @param gameStates
+     * @return
+     */
+    private GameState getLowestFcost(PriorityQueue<GameState> gameStates) {
      
     	GameState lowestFcost = null;
     	if (gameStates != null) {
@@ -236,6 +218,7 @@ public class PlannerAgent extends Agent {
 	    		}
 	    	}
     	}
+    	
     	return lowestFcost;
     }
 }

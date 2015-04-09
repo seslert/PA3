@@ -38,7 +38,15 @@ public interface StripsAction {
      */
     public GameState apply(GameState state);
     
-    public int getPeasantId();
+    /**
+     * Returns the ID of the unit associated with this action
+     * @return
+     */
+    public int getUnitId();
     
-    public void setPeasantId(int id);
+    /**
+     * Sets the ID of the unit associated with this action
+     * @param id
+     */
+    public void setUnitId(int id);
 }

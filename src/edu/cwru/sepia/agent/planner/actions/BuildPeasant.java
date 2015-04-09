@@ -15,53 +15,59 @@ public class BuildPeasant implements StripsAction {
 	private int peasantId;
 	private int peasantTemplateId;
 	
+	/**
+	 * Creates a BuildPeasant action associated with the given townhall
+	 * @param townhallId
+	 */
 	public BuildPeasant(int townhallId) {
 		
 		this.townhallId = townhallId;
 	}
 	
 	/**
-	 * 
+	 * Sets the unit ID of the peasant to be created
 	 */
 	@Override
-	public void setPeasantId(int id) {
+	public void setUnitId(int id) {
 		this.peasantId = id;
 	}
 	
 	/**
-	 * 
+	 * Gets the unit ID of the townhall creating the peasant
 	 * @return
 	 */
 	@Override
-	public int getPeasantId() {
+	public int getUnitId() {
 		
-		return getTownhallId();
+		return this.townhallId;
 	}
 	
+	/**
+	 * Gets the template ID of the peasant to be built
+	 * @return
+	 */
 	public int getPeasantTemplateId() {
 		
 		return this.peasantTemplateId;
 	}
 	
-	public int getTownhallId() {
-		
-		return this.townhallId;
-	}
-	
+	/**
+	 * Determines if the action can be executed in the state
+	 */
 	@Override
 	public boolean preconditionsMet(GameState state) {
 		return state.getGold() >= 400 && state.stateView.getSupplyCap(townhallId) > 0;
 	}
 	
+	/**
+	 * Applies the effects of the action to the state
+	 */
 	@Override
 	public GameState apply(GameState state) {
 		
 		TemplateView peasantTemplate = state.stateView.getTemplate(state.getPlayernum(), "Peasant");
 		peasantTemplateId = peasantTemplate.getID();
-		
 		Peasant peasant = new Peasant(state.getLargestPeasantId() + 1, new Position(state.townhall.getXPosition() - 1, state.townhall.getYPosition()));
-		//Peasant peasant = new Peasant(peasantTemplateID, new Position(state.townhall.getXPosition() + 2, state.townhall.getYPosition() + 2));
-		
 		this.peasantId = peasant.getID();
 		state.peasants.put(peasant.getID(), peasant);
 		state.removeGold(400);
@@ -70,6 +76,9 @@ public class BuildPeasant implements StripsAction {
 		return state;
 	}
 	
+	/**
+	 * Returns the result of the action in a readable form
+	 */
 	@Override
 	public String toString() {
 		

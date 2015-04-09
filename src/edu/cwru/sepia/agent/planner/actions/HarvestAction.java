@@ -16,6 +16,13 @@ public class HarvestAction implements StripsAction {
 	private int resourceId;
 	private int peasantId;
 	
+	/**
+	 * Creates a harvest action associated with a unit and a resource
+	 * @param peasantId
+	 * @param resourceDirection
+	 * @param resourceType
+	 * @param resourceId
+	 */
 	public HarvestAction(int peasantId, Direction resourceDirection, String resourceType, int resourceId) {
 		
 		this.peasantId = peasantId;
@@ -24,6 +31,11 @@ public class HarvestAction implements StripsAction {
 		this.resourceType = getEnum(resourceType);
 	}
 	
+	/**
+	 * Returns the resource type to be harvested based off of the string passed to the constructor
+	 * @param value
+	 * @return
+	 */
 	public ResourceType getEnum(String value) {
 		
 		if (value.toLowerCase().equals("tree")) {
@@ -34,7 +46,7 @@ public class HarvestAction implements StripsAction {
 	}
 	
 	/**
-	 * 
+	 * Returns the direction of the resource to be harvested.  Used for Sepia primitiveGather action
 	 * @return
 	 */
 	public Direction getResourceDirection() {
@@ -43,23 +55,26 @@ public class HarvestAction implements StripsAction {
 	}
 	
 	/**
-	 * 
+	 * Sets the ID of the unit associated with this action
 	 */
 	@Override
-	public void setPeasantId(int id) {
+	public void setUnitId(int id) {
 		this.peasantId = id;
 	}
 	
 	/**
-	 * 
+	 * Returns the ID of the unit associated with this action
 	 * @return
 	 */
 	@Override
-	public int getPeasantId() {
+	public int getUnitId() {
 		
 		return this.peasantId;
 	}
 	
+	/**
+	 * Determines if this action can be performed in the given state
+	 */
 	@Override
 	public boolean preconditionsMet(GameState state) {
 		
@@ -109,6 +124,9 @@ public class HarvestAction implements StripsAction {
 		return false;
 	}
 	
+	/**
+	 * Applies the effects of this action to the state
+	 */
 	@Override
 	public GameState apply(GameState state) {
 		
@@ -137,6 +155,9 @@ public class HarvestAction implements StripsAction {
 		return state;
 	}
 	
+	/**
+	 * Returns a purty formatted string representation of this action
+	 */
 	@Override
 	public String toString() {
 		
