@@ -13,14 +13,14 @@ public class HarvestAction implements StripsAction {
 	
 	private Direction resourceDirection;
 	private ResourceType resourceType;
-	private ResourceNode resourceNode;
+	private int resourceId;
 	private int peasantId;
 	
-	public HarvestAction(int peasantId, Direction resourceDirection, String resourceType, ResourceNode resourceNode) {
+	public HarvestAction(int peasantId, Direction resourceDirection, String resourceType, int resourceId) {
 		
 		this.peasantId = peasantId;
 		this.resourceDirection = resourceDirection;
-		this.resourceNode = resourceNode;
+		this.resourceId = resourceId;
 		this.resourceType = getEnum(resourceType);
 	}
 	
@@ -121,16 +121,18 @@ public class HarvestAction implements StripsAction {
 			state.peasants.get(peasantId).setCargoType(ResourceType.WOOD);
 			break;
 		}
-		state.peasants.get(peasantId).addCargo(resourceNode.reduceAmountRemaining(100));
-		if (resourceNode.getAmountRemaining() <= 0) {
-			state.resources.remove(resourceNode);
+		ResourceNode newResource = null;
+		for (ResourceNode resource : state.resources) {
+			if (resource.getID() == resourceId) {
+				newResource = resource;
+			}
+		}
+		state.peasants.get(peasantId).addCargo(newResource.reduceAmountRemaining(100));
+		if (newResource.getAmountRemaining() <= 0) {
+			state.resources.remove(newResource);
 		}
 		state.cost = 2;
-		state.gCost += state.cost;
-		
-//		if (resourceNode.getAmountRemaining() >= 100) {
-//			resourceNode.reduceAmountRemaining(100);
-//		}		
+		state.gCost += state.cost;	
 		
 		return state;
 	}

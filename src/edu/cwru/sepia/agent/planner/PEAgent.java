@@ -108,7 +108,7 @@ public class PEAgent extends Agent {
      */
     @Override
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
-        
+        System.out.println("testing1");
     	Map<Integer, Action> executionPlan = new LinkedHashMap<Integer, Action>();
 		
 		if (stateView.getTurnNumber() == 0) {
@@ -116,6 +116,7 @@ public class PEAgent extends Agent {
 			executionPlan.put(nextAction.getPeasantId(), createSepiaAction(nextAction));
 		}
 		else if (!plan.isEmpty()) {    			
+			System.out.println("testing");
 			Map<Integer, ActionResult> actionResults = historyView.getCommandFeedback(playernum, stateView.getTurnNumber() - 1);
 			
 			for (ActionResult result : actionResults.values()) {
@@ -172,7 +173,7 @@ public class PEAgent extends Agent {
     	if (action instanceof BuildPeasant) {
     		BuildPeasant buildPeasant = (BuildPeasant) action;
     		System.out.println("buildPeasant.getPeasantTemplateId(): " + buildPeasant.getPeasantTemplateId());
-    		return Action.createCompoundProduction(buildPeasant.getTownhallId(), buildPeasant.getPeasantTemplateId());
+    		return Action.createPrimitiveProduction(buildPeasant.getTownhallId(), buildPeasant.getPeasantTemplateId());
     	}
         
     	return null;

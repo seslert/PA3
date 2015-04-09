@@ -102,6 +102,12 @@ public class PlannerAgent extends Agent {
     	
     	while (!openSet.isEmpty()) {    		
     		current = GetLowestFcost(openSet);
+//    		try {
+//				Thread.sleep(5000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 //    		if (current.actionHistory instanceof BuildPeasant && reset == false) {
 //    			slow = true;
 //    			reset = true;

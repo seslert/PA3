@@ -62,6 +62,30 @@ ACTION: MOVE( Peasant 1 | (7, 8) )
 
 ACTION: DEPOSIT( Peasant 1 | WOOD )
 
+ACTION: MOVE( Peasant 1 | (5, 5) )
+
+ACTION: HARVEST( Peasant 1 | WOOD )
+
+ACTION: MOVE( Peasant 1 | (7, 8) )
+
+ACTION: DEPOSIT( Peasant 1 | WOOD )
+
+ACTION: MOVE( Peasant 1 | (11, 5) )
+
+ACTION: HARVEST( Peasant 1 | WOOD )
+
+ACTION: MOVE( Peasant 1 | (9, 8) )
+
+ACTION: DEPOSIT( Peasant 1 | WOOD )
+
+ACTION: MOVE( Peasant 1 | (11, 5) )
+
+ACTION: HARVEST( Peasant 1 | WOOD )
+
+ACTION: MOVE( Peasant 1 | (9, 8) )
+
+ACTION: DEPOSIT( Peasant 1 | WOOD )
+
 ACTION: MOVE( Peasant 1 | (14, 4) )
 
 ACTION: HARVEST( Peasant 1 | GOLD )
@@ -133,6 +157,30 @@ ACTION: HARVEST( Peasant 1 | GOLD )
 ACTION: MOVE( Peasant 3 | (21, 17) )
 
 ACTION: HARVEST( Peasant 3 | GOLD )
+
+ACTION: MOVE( Peasant 1 | (9, 10) )
+
+ACTION: DEPOSIT( Peasant 1 | GOLD )
+
+ACTION: MOVE( Peasant 1 | (21, 15) )
+
+ACTION: HARVEST( Peasant 1 | GOLD )
+
+ACTION: MOVE( Peasant 1 | (9, 10) )
+
+ACTION: DEPOSIT( Peasant 1 | GOLD )
+
+ACTION: MOVE( Peasant 1 | (21, 15) )
+
+ACTION: HARVEST( Peasant 1 | GOLD )
+
+ACTION: MOVE( Peasant 1 | (9, 10) )
+
+ACTION: DEPOSIT( Peasant 1 | GOLD )
+
+ACTION: MOVE( Peasant 1 | (21, 15) )
+
+ACTION: HARVEST( Peasant 1 | GOLD )
 
 ACTION: MOVE( Peasant 1 | (9, 10) )
 

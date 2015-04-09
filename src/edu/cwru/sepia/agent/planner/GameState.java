@@ -115,7 +115,7 @@ public class GameState implements Comparable<GameState> {
     	this.xExtent = this.stateView.getXExtent();
     	this.yExtent = this.stateView.getYExtent();
     	this.units = parent.units;
-    	this.resources = new ArrayList<ResourceNode>(parent.resources);
+    	this.resources = new ArrayList<ResourceNode>();
     	this.peasants = new HashMap<Integer, Peasant>();
     	this.gCost = Double.MAX_VALUE;
     	this.cost = 0.0;
@@ -125,12 +125,9 @@ public class GameState implements Comparable<GameState> {
     		this.peasants.put(peasant.getID(), peasant.Clone(peasant));
     	}
     	
-//    	for (ResourceNode resource : parent.resources) {
-//    		this.resources.add(resource.copyOf());
-//    	}
-    	
-    	//this.resources = new ArrayList<ResourceNode>();
-    	//discoverResources(stateView);
+    	for (ResourceNode resource : parent.resources) {
+    		this.resources.add(cloneResource(resource));
+    	}
     	
     	this.townhall = parent.townhall;	
     	
@@ -139,10 +136,8 @@ public class GameState implements Comparable<GameState> {
     	this.grossWood = parent.grossWood;
     }
     
-    private ResourceNode cloneResource(ResourceNode resource) {
-    	ResourceNode newResource = new ResourceNode(resource.getType(), resource.getxPosition(), resource.getyPosition(), resource.getAmountRemaining(), resource.getID());
-    	
-    	return newResource;
+    public ResourceNode cloneResource(ResourceNode resource) {
+    	return new ResourceNode(resource.getType(), resource.getxPosition(), resource.getyPosition(), resource.getAmountRemaining(), resource.ID);
     }
     
     private void discoverUnits(State.StateView s) {
@@ -241,9 +236,11 @@ public class GameState implements Comparable<GameState> {
     				Position resourcePos = getResourcePosition(resource);
     				
     				if (peasant.getCargoAmount() == 0 && peasantPos.isAdjacent(resourcePos)) {
-    					HarvestAction harvestAction = new HarvestAction(peasant.getID(), peasantPos.getDirection(resourcePos), resource.getType().name().toUpperCase(), resource);
+    					System.out.println("before harvest: " + resource.getAmountRemaining());
+    					HarvestAction harvestAction = new HarvestAction(peasant.getID(), peasantPos.getDirection(resourcePos), resource.getType().name().toUpperCase(), resource.ID);
     					GameState st = new GameState(this, harvestAction);
     					children.add(harvestAction.apply(st));
+    					System.out.println("after harvest: " + resource.getAmountRemaining());
     				}
     				// The peasant needs to move adjacent to the resource we still need.
     				else if (needResource(resource)) {
@@ -349,7 +346,7 @@ public class GameState implements Comparable<GameState> {
     		
     		// Peasant needs to move to a resource to be able to harvest it
     		if (peasant.getCargoAmount() == 0 && actionHistory instanceof MoveAction) {
-    			overallH += 100;
+    			overallH += 300;
     		}
     	}
     	
@@ -549,7 +546,6 @@ public class GameState implements Comparable<GameState> {
     	builder.append("Current Gold: " + getCurrentGold() + " | Current Wood: " + getCurrentWood() + "\n");
     	builder.append("Gross Gold: " + grossGold + " | Gross Wood: " + grossWood + "\n");
     	builder.append("Active Peasants: " + peasants.size() + " | Remaining Resources: " + resources.size() + "\n");
-    	builder.append("personshit: " + playernum);
     	
     	if (actionHistory != null) {
     		builder.append("Action History: " + actionHistory.toString() + "\n");
