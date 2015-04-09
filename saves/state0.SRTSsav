@@ -789,11 +789,11 @@
             <affectedUnitTypes>2</affectedUnitTypes>
         </template>
         <resourceAmount>
-            <quantity>1000</quantity>
+            <quantity>2000</quantity>
             <type>GOLD</type>
         </resourceAmount>
         <resourceAmount>
-            <quantity>1000</quantity>
+            <quantity>2000</quantity>
             <type>WOOD</type>
         </resourceAmount>
         <supply>3</supply>
@@ -805,30 +805,6 @@
         <xPosition>22</xPosition>
         <yPosition>16</yPosition>
         <initialAmount>0</initialAmount>
-        <amountRemaining>3800</amountRemaining>
-    </resourceNode>
-    <resourceNode>
-        <ID>6</ID>
-        <type>TREE</type>
-        <xPosition>12</xPosition>
-        <yPosition>13</yPosition>
-        <initialAmount>0</initialAmount>
-        <amountRemaining>400</amountRemaining>
-    </resourceNode>
-    <resourceNode>
-        <ID>7</ID>
-        <type>TREE</type>
-        <xPosition>17</xPosition>
-        <yPosition>9</yPosition>
-        <initialAmount>0</initialAmount>
-        <amountRemaining>400</amountRemaining>
-    </resourceNode>
-    <resourceNode>
-        <ID>9</ID>
-        <type>TREE</type>
-        <xPosition>12</xPosition>
-        <yPosition>4</yPosition>
-        <initialAmount>0</initialAmount>
-        <amountRemaining>200</amountRemaining>
+        <amountRemaining>2800</amountRemaining>
     </resourceNode>
 </state>

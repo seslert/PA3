@@ -236,11 +236,9 @@ public class GameState implements Comparable<GameState> {
     				Position resourcePos = getResourcePosition(resource);
     				
     				if (peasant.getCargoAmount() == 0 && peasantPos.isAdjacent(resourcePos)) {
-    					System.out.println("before harvest: " + resource.getAmountRemaining());
     					HarvestAction harvestAction = new HarvestAction(peasant.getID(), peasantPos.getDirection(resourcePos), resource.getType().name().toUpperCase(), resource.ID);
     					GameState st = new GameState(this, harvestAction);
     					children.add(harvestAction.apply(st));
-    					System.out.println("after harvest: " + resource.getAmountRemaining());
     				}
     				// The peasant needs to move adjacent to the resource we still need.
     				else if (needResource(resource)) {
@@ -346,7 +344,7 @@ public class GameState implements Comparable<GameState> {
     		
     		// Peasant needs to move to a resource to be able to harvest it
     		if (peasant.getCargoAmount() == 0 && actionHistory instanceof MoveAction) {
-    			overallH += 300;
+    			overallH += 100;
     		}
     	}
     	
